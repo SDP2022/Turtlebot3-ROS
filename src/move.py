@@ -28,7 +28,7 @@ class free_space_navigation():
 
     def shutdown(self):
         # stop turtlebot
-        rospy.loginfo("Stopping moving forward")
+        rospy.loginfo("Stopping move node")
         self.velocityPublisher.publish(Twist())
         rospy.sleep(1)
 
@@ -43,6 +43,7 @@ class free_space_navigation():
 
     def move_v1(self, speed, distance, isForward):
         # setup initial moving message
+        # TODO use coordinate
         VelocityMessage = Twist()
         listener = tf.TransformListener()
         if (isForward):
@@ -71,6 +72,7 @@ class free_space_navigation():
             rospy.loginfo("Turtlebot moves forwards")
             self.velocityPublisher.publish(VelocityMessage)
             loop_rate.sleep()
+            # waiting new transform message
             try:
                 listener.waitForTransform(
                     "/base_footprint", "/odom", rospy.Time(0), rospy.Duration(10.0))
@@ -78,9 +80,11 @@ class free_space_navigation():
                     '/base_footprint', '/odom', rospy.Time(0))
             except (tf.LookupException, tf.ConnectivityException, tf.ExtrapolationException):
                 rospy.Duration(1.0)
-            end = 0.5 * sqrt(trans[0] ** 2 + trans[1] ** 2)
-            distance_moved = distance_moved + \
-                abs(abs(float(end)) - abs(float(start)))
+            rospy.loginfo(trans)
+            #calculate moved distance
+            now_end = 0.5 * sqrt(trans[0] ** 2 + trans[1] ** 2)
+            distance_moved += abs(abs(float(now_end)) - abs(float(start)))
+            rospy.loginfo(distance_moved)
             if not (distance_moved < distance):
                 break
         VelocityMessage.linear.x = 0
