@@ -42,54 +42,33 @@ class free_space_navigation():
         self.turtlebot_odom_pose.pose.pose.orientation.z = pose_message.pose.pose.orientation.z
 
     def move_v1(self, speed, distance, isForward):
-        # setup initial moving message
-        # TODO use coordinate
         VelocityMessage = Twist()
         listener = tf.TransformListener()
+        initial_turtlebot_odom_pose = Odometry()
+        init_transform = geometry_msgs.msg.TransformStamped()
+        current_transform = geometry_msgs.msg.TransformStamped()
         if (isForward):
-            VelocityMessage.linear.x = abs(speed)
+                VelocityMessage.linear.x =abs(speed)
         else:
-            VelocityMessage.linear.x = -abs(speed)
-        VelocityMessage.linear.y = 0
-        VelocityMessage.linear.z = 0
+                VelocityMessage.linear.x =-abs(speed)
+        VelocityMessage.linear.y =0
+        VelocityMessage.linear.z =0
         VelocityMessage.angular.x = 0
         VelocityMessage.angular.y = 0
         VelocityMessage.angular.z = 0
-        # wait for transform
-        listener = tf.TransformListener()
-        try:
-            listener.waitForTransform(
-                "/base_footprint", "/odom", rospy.Time(0), rospy.Duration(10.0))
-            (trans, rot) = listener.lookupTransform(
-                '/base_footprint', '/odom', rospy.Time(0))
-            start = 0.5 * sqrt(trans[0] ** 2 + trans[1] ** 2)
-        except Exception:
-            rospy.Duration(1.0)
-        # moving forward (panza vor!)
-        distance_moved = 0
-        loop_rate = rospy.Rate(10)
-        while True:
-            rospy.loginfo("Turtlebot moves forwards")
-            self.velocityPublisher.publish(VelocityMessage)
-            loop_rate.sleep()
-            # waiting new transform message
-            try:
-                listener.waitForTransform(
-                    "/base_footprint", "/odom", rospy.Time(0), rospy.Duration(10.0))
-                (trans, rot) = listener.lookupTransform(
-                    '/base_footprint', '/odom', rospy.Time(0))
-            except (tf.LookupException, tf.ConnectivityException, tf.ExtrapolationException):
-                rospy.Duration(1.0)
-            rospy.loginfo(trans)
-            # calculate moved distance
-            now_end = 0.5 * sqrt(trans[0] ** 2 + trans[1] ** 2)
-            distance_moved += abs(abs(float(now_end)) - abs(float(start)))
-            rospy.loginfo(distance_moved)
-            if not (distance_moved < distance):
-                break
-        VelocityMessage.linear.x = 0
+        distance_moved = 0.0
+        loop_rate = rospy.Rate(20)
+        initial_turtlebot_odom_pose = copy.deepcopy(self.turtlebot_odom_pose)
+        while True :
+                rospy.loginfo("Turtlebot moves forwards")
+                self.velocityPublisher.publish(VelocityMessage)
+                loop_rate.sleep()
+                distance_moved = distance_moved+abs(0.5 * sqrt(((self.turtlebot_odom_pose.pose.pose.position.x-initial_turtlebot_odom_pose.pose.pose.position.x) ** 2) +
+                    ((self.turtlebot_odom_pose.pose.pose.position.x-initial_turtlebot_odom_pose.pose.pose.position.x) ** 2)))    
+                if not (distance_moved<distance):
+                    break
+        VelocityMessage.linear.x =0
         self.velocityPublisher.publish(VelocityMessage)
-        rospy.loginfo("Move {0} completed. Turtlebot stopped".format(distance))
 
 
 if __name__ == '__main__':
