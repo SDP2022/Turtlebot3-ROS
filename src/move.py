@@ -19,8 +19,8 @@ class free_space_navigation():
         self.turtlebot_odom_pose = Odometry()
         self.velocityPublisher = rospy.Publisher('/cmd_vel', Twist, queue_size=10)
         self.pose_subscriber = rospy.Subscriber("/odom", Odometry, self.poseCallback)
-        movelength = 0.1
-        maximum_speed = 0.01
+        movelength = 0.3
+        maximum_speed = 0.025
         self.move_v1(maximum_speed, movelength, True)
         rospy.loginfo("All step completed. Trying auto termination")
         raise rospy.ROSInterruptException
@@ -58,7 +58,8 @@ class free_space_navigation():
         #TODO CHECK IMU!
         distance_moved = 0.0
         loop_rate = rospy.Rate(20)
-        loop_rate.sleep() #waiting for initial odom pos
+        waiting_rate = rospy.Rate(1)
+        waiting_rate.sleep() #waiting for initial odom pos
         initial_turtlebot_odom_pose = copy.deepcopy(self.turtlebot_odom_pose)
         rospy.loginfo('Initial x={0}'.format(initial_turtlebot_odom_pose.pose.pose.position.x))
         while True :
