@@ -59,7 +59,8 @@ class free_space_navigation():
         #TODO CHECK IMU!
         distance_moved = 0.0
         loop_rate = rospy.Rate(20)
-        loop_rate.sleep() #waiting for initial odom pos
+        waiting_rate = rospy.Rate(1)
+        waiting_rate.sleep() #waiting for initial odom pos
         initial_turtlebot_odom_pose = copy.deepcopy(self.turtlebot_odom_pose)
         rospy.loginfo('Initial x={0}'.format(initial_turtlebot_odom_pose.pose.pose.position.x))
         while True :
