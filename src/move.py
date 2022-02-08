@@ -84,7 +84,7 @@ class free_space_navigation():
         
         angle_turned = 0.0
 
-        angular_velocity = (-angular_velocity, ANGULAR_VELOCITY_MINIMUM_THRESHOLD)[angular_velocity > ANGULAR_VELOCITY_MINIMUM_THRESHOLD]
+        angular_velocity = (-angular_velocity, 0.2)[angular_velocity > 0.2]
 
         while(radians < 0):
             radians += 2* pi
