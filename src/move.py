@@ -17,14 +17,13 @@ class free_space_navigation():
         rospy.init_node('move', anonymous=True)
         rospy.on_shutdown(self.shutdown)
         self.turtlebot_odom_pose = Odometry()
-        pose_message = Odometry()
-        self.velocityPublisher = rospy.Publisher(
-            '/cmd_vel', Twist, queue_size=10)
-        self.pose_subscriber = rospy.Subscriber(
-            "/odom", Odometry, self.poseCallback)
-        movelength = 1
-        self.move_v1(0.1, movelength, True)
-        rospy.loginfo("All step completed.. Use control+C to terminated")
+        self.velocityPublisher = rospy.Publisher('/cmd_vel', Twist, queue_size=10)
+        self.pose_subscriber = rospy.Subscriber("/odom", Odometry, self.poseCallback)
+        movelength = 0.1
+        maximum_speed = 0.01
+        self.move_v1(maximum_speed, movelength, True)
+        rospy.loginfo("All step completed. Trying auto termination")
+        raise rospy.ROSInterruptException
 
     def shutdown(self):
         # stop turtlebot
@@ -42,11 +41,9 @@ class free_space_navigation():
         self.turtlebot_odom_pose.pose.pose.orientation.z = pose_message.pose.pose.orientation.z
 
     def move_v1(self, speed, distance, isForward):
+        #setting intial speed
         VelocityMessage = Twist()
-        listener = tf.TransformListener()
         initial_turtlebot_odom_pose = Odometry()
-        init_transform = geometry_msgs.msg.TransformStamped()
-        current_transform = geometry_msgs.msg.TransformStamped()
         if (isForward):
                 VelocityMessage.linear.x =abs(speed)
         else:
@@ -56,19 +53,24 @@ class free_space_navigation():
         VelocityMessage.angular.x = 0
         VelocityMessage.angular.y = 0
         VelocityMessage.angular.z = 0
+
+        #initial_turtlebot_odom_pose = Odometry()
+        #TODO CHECK IMU!
         distance_moved = 0.0
         loop_rate = rospy.Rate(20)
+        loop_rate.sleep() #waiting for initial odom pos
         initial_turtlebot_odom_pose = copy.deepcopy(self.turtlebot_odom_pose)
+        rospy.loginfo('Initial x={0}'.format(initial_turtlebot_odom_pose.pose.pose.position.x))
         while True :
-                rospy.loginfo("Turtlebot moves forwards")
+                rospy.loginfo('distance_moved={0}'.format(distance_moved))
                 self.velocityPublisher.publish(VelocityMessage)
-                loop_rate.sleep()
-                distance_moved = distance_moved+abs(0.5 * sqrt(((self.turtlebot_odom_pose.pose.pose.position.x-initial_turtlebot_odom_pose.pose.pose.position.x) ** 2) +
-                    ((self.turtlebot_odom_pose.pose.pose.position.x-initial_turtlebot_odom_pose.pose.pose.position.x) ** 2)))    
+                distance_moved = abs(self.turtlebot_odom_pose.pose.pose.position.x - initial_turtlebot_odom_pose.pose.pose.position.x)  
                 if not (distance_moved<distance):
                     break
+                loop_rate.sleep()
         VelocityMessage.linear.x =0
         self.velocityPublisher.publish(VelocityMessage)
+        rospy.loginfo('Final x={0}'.format(self.turtlebot_odom_pose.pose.pose.position.x))
 
 
 if __name__ == '__main__':
