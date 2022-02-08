@@ -25,8 +25,8 @@ class free_space_navigation():
         #     self.move_v1(maximum_speed, movelength, True)
         #     self.rotate(0.5, self.degree2radian(90.0),True)
         self.move_v1(maximum_speed, movelength, True)
-        # self.rotate(0.5, self.degree2radian(90.0),True)
-        # self.move_v1(maximum_speed, movelength, True)
+        self.rotate(0.5, self.degree2radian(90.0),True)
+        self.move_v1(maximum_speed, movelength, True)
         rospy.loginfo("All step completed. Trying auto termination")
         raise rospy.ROSInterruptException
 
@@ -71,8 +71,8 @@ class free_space_navigation():
                 rospy.loginfo('distance_moved={0}'.format(distance_moved))
                 self.velocityPublisher.publish(VelocityMessage)
                 loop_rate.sleep()
-                distance_moved = distance_moved+abs(0.5 * sqrt(((self.turtlebot_odom_pose.pose.pose.position.x-initial_turtlebot_odom_pose.pose.pose.position.x) ** 2) +
-                        ((self.turtlebot_odom_pose.pose.pose.position.x-initial_turtlebot_odom_pose.pose.pose.position.x) ** 2)))
+                distance_moved = sqrt(((self.turtlebot_odom_pose.pose.pose.position.x-initial_turtlebot_odom_pose.pose.pose.position.x) ** 2) +
+                        ((self.turtlebot_odom_pose.pose.pose.position.y-initial_turtlebot_odom_pose.pose.pose.position.y) ** 2))
                 if not (distance_moved<distance):
                     break
         VelocityMessage.linear.x =0
@@ -90,9 +90,9 @@ class free_space_navigation():
 
         while(radians < 0):
             radians += 2* pi
-
         while(radians > 2* pi):
             radians -= 2* pi
+        
         listener.waitForTransform("/base_footprint", "/odom", rospy.Time(0), rospy.Duration(10.0) )
         (trans,rot) = listener.lookupTransform('/base_footprint', '/odom', rospy.Time(0))
         init_transform.transform.translation = trans
