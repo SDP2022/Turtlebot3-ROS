@@ -21,10 +21,10 @@ class free_space_navigation():
         self.pose_subscriber = rospy.Subscriber("/odom", Odometry, self.poseCallback)
         movelength = 0.5
         maximum_speed = 0.025
-        for i in range(0,4):
-            self.move_v1(maximum_speed, movelength, True)
-            self.rotate(0.5, self.degree2radian(90.0),True)
-        # self.move_v1(maximum_speed, movelength, True)
+        # for i in range(0,4):
+        #     self.move_v1(maximum_speed, movelength, True)
+        #     self.rotate(0.5, self.degree2radian(90.0),True)
+        self.move_v1(maximum_speed, movelength, True)
         # self.rotate(0.5, self.degree2radian(90.0),True)
         # self.move_v1(maximum_speed, movelength, True)
         rospy.loginfo("All step completed. Trying auto termination")
@@ -70,10 +70,11 @@ class free_space_navigation():
         while True :
                 rospy.loginfo('distance_moved={0}'.format(distance_moved))
                 self.velocityPublisher.publish(VelocityMessage)
-                distance_moved = abs(self.turtlebot_odom_pose.pose.pose.position.x - initial_turtlebot_odom_pose.pose.pose.position.x)  
+                loop_rate.sleep()
+                distance_moved = distance_moved+abs(0.5 * sqrt(((self.turtlebot_odom_pose.pose.pose.position.x-initial_turtlebot_odom_pose.pose.pose.position.x) ** 2) +
+                        ((self.turtlebot_odom_pose.pose.pose.position.x-initial_turtlebot_odom_pose.pose.pose.position.x) ** 2)))
                 if not (distance_moved<distance):
                     break
-                loop_rate.sleep()
         VelocityMessage.linear.x =0
         self.velocityPublisher.publish(VelocityMessage)
         rospy.loginfo('Final x={0}'.format(self.turtlebot_odom_pose.pose.pose.position.x))
