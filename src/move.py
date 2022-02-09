@@ -22,7 +22,7 @@ class free_space_navigation():
             '/cmd_vel', Twist, queue_size=10)
         self.pose_subscriber = rospy.Subscriber(
             "/odom", Odometry, self.poseCallback)
-        for _ in range(0,4):
+        for _ in range(0, 4):
             self.move_v1(0.025, 0.5, True)
             self.rotate_v1(0.1, 90.0, True)
         rospy.loginfo("All step completed. Trying auto termination")
@@ -134,9 +134,9 @@ class free_space_navigation():
         cosy_cosp = 1 - 2 * (orientation.y * orientation.y +
                              orientation.z * orientation.z)
         yaw = math.atan2(siny_cosp, cosy_cosp)
-        if isClockwise and yaw <=0:
+        if isClockwise and yaw <= 0:
             yaw += 2 * pi
-        elif not isClockwise and yaw >=0:
+        elif not isClockwise and yaw >= 0:
             yaw -= 2 * pi
         return yaw
 
