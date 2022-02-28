@@ -12,7 +12,7 @@ def control_command_client(x, y):
     
     try:
         control_command = rospy.ServiceProxy('control_service', ControlCommand)
-        print("Requesting %s+%s"%(x, y))
+        print("Requesting displacement=%s rotation=%s"%(x, y))
         # simplified style
         resp1 = control_command(x, y)
         # formal style
@@ -27,11 +27,7 @@ def usage():
 if __name__ == "__main__":
     
     argv = rospy.myargv()
-    if len(argv) == 1:
-        import random
-        x = random.randint(-50000, 50000)
-        y = random.randint(-50000, 50000)
-    elif len(argv) == 3:
+    if len(argv) == 3:
         try:
             x = int(argv[1])
             y = int(argv[2])
@@ -41,4 +37,4 @@ if __name__ == "__main__":
     else:
         print(usage())
         sys.exit(1)
-    print("%s + %s = %s"%(x, y, control_command_client(x, y)))
+    print("displacement=%s rotation=%s status= %s"%(x, y, control_command_client(x, y)))
