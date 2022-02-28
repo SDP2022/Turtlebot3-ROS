@@ -64,6 +64,7 @@ find_package(catkin REQUIRED COMPONENTS
 add_service_files(
   FILES
   AddTwoInts.srv
+  ControlCommand.srv
 )
 
 ## Generate actions in the 'action' folder

@@ -1,0 +1,4 @@
+float64 displacement
+float64 rotation
+---
+bool status
