@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.0.2)
-project(Turtlebot3-ROS)
+project(painted)
 
 ## Compile as C++11, supported in ROS Kinetic and newer
 # add_compile_options(-std=c++11)
@@ -17,6 +17,7 @@ find_package(catkin REQUIRED COMPONENTS
   sensor_msgs
   std_msgs
   turtlebot3_msgs
+  message_generation
 )
 
 ## System dependencies are found with CMake's conventions
@@ -60,11 +61,10 @@ find_package(catkin REQUIRED COMPONENTS
 # )
 
 ## Generate services in the 'srv' folder
-# add_service_files(
-#   FILES
-#   Service1.srv
-#   Service2.srv
-# )
+add_service_files(
+  FILES
+  AddTwoInts.srv
+)
 
 ## Generate actions in the 'action' folder
 # add_action_files(
@@ -74,10 +74,11 @@ find_package(catkin REQUIRED COMPONENTS
 # )
 
 ## Generate added messages and services with any dependencies listed here
-# generate_messages(
-#   DEPENDENCIES
-#   diagnostic_msgs#   sensor_msgs#   std_msgs#   turtlebot3_msgs
-# )
+generate_messages(
+  DEPENDENCIES
+  std_msgs
+  # diagnostic_msgs#   sensor_msgs#   std_msgs#   turtlebot3_msgs
+)
 
 ################################################
 ## Declare ROS dynamic reconfigure parameters ##
@@ -113,6 +114,7 @@ catkin_package(
 #  LIBRARIES Turtlebot3-ROS
 #  CATKIN_DEPENDS diagnostic_msgs hls_lfcd_lds_driver joint_state_publisher roscpp rospy rosserial_python sensor_msgs std_msgs turtlebot3_msgs
 #  DEPENDS system_lib
+  CATKIN_DEPENDS message_runtime
 )
 
 ###########
@@ -210,3 +212,7 @@ include_directories(
 
 ## Add folders to be run by python nosetests
 # catkin_add_nosetests(test)
+
+catkin_install_python(PROGRAMS scripts/add_two_ints_server.py scripts/add_two_ints_client.py
+  DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
+)
