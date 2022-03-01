@@ -34,16 +34,14 @@ class control_node():
         # Initial transform
         self.initial_transform()
 
-        rospy.loginfo("Starting control_node service")
-
-        # spin() keeps Python from exiting until node is shutdown
-        rospy.spin()
+        self.log_info("Starting control_node service")
     
     def shutdown(self):
         # stop turtlebot
-        rospy.loginfo("Stopping move node")
+        self.log_info("Stopping move node")
         self.cmd_vel.publish(Twist())
-        rospy.sleep(1)
+        self.log_info("Stop message publish success")
+        
 
     def initial_transform(self):
         self.tf_listener = tf.TransformListener()
@@ -59,9 +57,9 @@ class control_node():
                 self.tf_listener.waitForTransform(self.odom_frame, '/base_link', rospy.Time(), rospy.Duration(1.0))
                 self.base_frame = '/base_link'
             except (tf.Exception, tf.ConnectivityException, tf.LookupException):
-                rospy.loginfo("Cannot find transform between /odom and /base_link or /base_footprint")
+                self.log_info("Cannot find transform between /odom and /base_link or /base_footprint")
                 rospy.signal_shutdown("tf Exception")
-        rospy.loginfo('transform complete, base_frame={0}'.format(self.base_frame))
+        self.log_info('transform complete, base_frame={0}'.format(self.base_frame))
 
     def control_command_callback(self, req):
         print("Executing displacement=%s rotation=%s" % (req.displacement, req.rotation))
@@ -98,9 +96,9 @@ class control_node():
             # Compute the Euclidean distance from the start
             current_distance = sqrt(pow((position.x - x_start), 2) + 
                             pow((position.y - y_start), 2))
-            rospy.loginfo("current_distance={0} position.x={1} position.y={2}".format(current_distance, position.x, position.y))
+            self.log_info("current_distance={0} position.x={1} position.y={2}".format(current_distance, position.x, position.y))
         self.cmd_vel.publish(Twist())
-        rospy.loginfo("Move distance={0} completed. Acutal distance={1}".format(goal_distance, current_distance))
+        self.log_info("Move distance={0} completed. Acutal distance={1}".format(goal_distance, current_distance))
         return True
 
     def rotation(self, goal_angle):
@@ -135,9 +133,9 @@ class control_node():
             current_angle += delta_angle
             last_angle = rotation
 
-            rospy.loginfo("current_rotation={0}".format(current_angle))
+            self.log_info("current_rotation={0}".format(current_angle))
         self.cmd_vel.publish(Twist())
-        rospy.loginfo("Rotation={0} completed. Acutal rotation={1}".format(goal_angle, current_angle))
+        self.log_info("Rotation={0} completed. Acutal rotation={1}".format(goal_angle, current_angle))
         return True
 
     def get_odom(self):
@@ -145,7 +143,7 @@ class control_node():
         try:
             (trans, rot)  = self.tf_listener.lookupTransform(self.odom_frame, self.base_frame, rospy.Time(0))
         except (tf.Exception, tf.ConnectivityException, tf.LookupException):
-            rospy.loginfo("TF Exception")
+            self.log_info("TF Exception")
             return
         return (Point(*trans), self.quat_to_angle(Quaternion(*rot)))
 
@@ -161,10 +159,17 @@ class control_node():
         while res < -pi:
             res += 2.0 * pi
         return res
+    
+    def log_info(self, message):
+        return rospy.loginfo("[{0}]{1}".format(NAME, message))
 
 if __name__ == "__main__":
     rospy.loginfo("Starting control_node service")
-    try:
-        control_node()
-    except rospy.ROSInterruptException:
-        rospy.loginfo("node terminated.")
+    control_node()
+    rospy.spin()
+    # try:
+    #     control_node()
+    #     # spin() keeps Python from exiting until node is shutdown
+    #     rospy.spin()
+    # except rospy.ROSInterruptException:
+    #     rospy.loginfo("node terminated.")
