@@ -87,8 +87,6 @@ roslaunch src/painted/launch/painted.launch
 └── srv # Folder for all service messages
     ├── AddTwoInts.srv # Test file, subject to remove
     └── ControlCommand.srv # Control node service msg define
-
-6 directories, 15 files
 ```
 
 ## Useful command and QA
