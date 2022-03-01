@@ -1,3 +1,4 @@
+<!-- Empty world simulation -->
 <launch>
   <env name="ROS_MASTER_URI" value="http://localhost:11311" />
   <env name="ROS_HOTNAME" value="$HOSTNAME" />

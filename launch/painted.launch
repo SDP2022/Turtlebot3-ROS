@@ -1,0 +1,4 @@
+<!-- Starting painted on turtlebot-->
+<launch>
+  <node name="control" pkg="painted" type="control.py" output="screen"/>
+</launch>
