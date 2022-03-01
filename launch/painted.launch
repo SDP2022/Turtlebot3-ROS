@@ -1,4 +1,5 @@
 <!-- Starting painted on turtlebot-->
 <launch>
+  <include file="$(find turtlebot3_bringup)/launch/turtlebot3_robot.launch"/>
   <node name="control" pkg="painted" type="control.py" output="screen"/>
 </launch>
