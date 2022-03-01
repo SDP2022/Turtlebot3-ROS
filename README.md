@@ -11,7 +11,7 @@ Package Name: painted
 Turtlebot type: Burger
 
 Quick start guide is based on DICE machine and I assume your already got ros installed.
-If you running vm on your own machine, follow the setup guide ![here](https://emanual.robotis.com/docs/en/platform/turtlebot3/quick-start/#pc-setup) first, then skip step 2.
+If you running vm on your own machine, follow the setup guide [here](https://emanual.robotis.com/docs/en/platform/turtlebot3/quick-start/#pc-setup) first, then skip step 2.
 
 
 ## Quick start guide
@@ -30,7 +30,7 @@ open~/.bashrc and at the end of the file, add this:
 source ~/catkin_ws/devel/setup.bash
 ```
 
-#### 2.git clone dependencies (skip this if you done setup guide ![here](https://emanual.robotis.com/docs/en/platform/turtlebot3/quick-start/#pc-setup))
+#### 2.git clone dependencies (skip this if you done setup guide [here](https://emanual.robotis.com/docs/en/platform/turtlebot3/quick-start/#pc-setup))
 ```
 cd ~/catkin_ws/src
 git clone -b noetic-devel https://github.com/ROBOTIS-GIT/DynamixelSDK.git
