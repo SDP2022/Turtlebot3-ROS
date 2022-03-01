@@ -84,7 +84,7 @@ roslaunch src/painted/launch/painted.launch
 │   ├── move.py # demo1 movement file
 │   ├── move_test.py # demo1 movement file
 │   └── slam_data_json_output.py # Script for outputing /map data into json file
-└── srv #Folder for all service messages
+└── srv # Folder for all service messages
     ├── AddTwoInts.srv # Test file, subject to remove
     └── ControlCommand.srv # Control node service msg define
 
