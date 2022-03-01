@@ -1,8 +1,11 @@
 # Turtlebot3-ROS
 University of Edinburgh SDP 2022 Gourp15 Turtlebot3 ROS Codebase
+#### This repo and readme is currently managing and monitoring by Ivan Zhong, pin me if readme doesn't work.
+#### Last update: 11:31AM 1, March
 
 Package Name: painted
-Tutlebot type: Burger
+
+Turtlebot type: Burger
 
 Quick start guide is based on DICE machine and I assume your already got ros installed.
 If you running vm in your on machine, follow the setup guide ![here](https://emanual.robotis.com/docs/en/platform/turtlebot3/quick-start/#pc-setup) first, then skip step 2.
@@ -46,18 +49,52 @@ catkin_make
 
 #### 4.run simulation
 ```
-  source ~/catkin_ws/devel/setup.bash
-  cd ~/catkin_ws
-  roslaunch src/painted/launch/simulation.launch
+source ~/catkin_ws/devel/setup.bash
+cd ~/catkin_ws
+roslaunch src/painted/launch/simulation.launch
 ```
 Now you should see gazebo running and painted software started.
 
+## Running painted code on robot
+SSH into robot and launch painted software:
+```
+ssh -XC pi@tentacool
+(password: turtlebot)
+cd ~/catkin_ws
+roslaunch src/painted/launch/painted.launch
+```
 
+## Repo strucutre
+
+```
+.
+├── CMakeLists.txt
+├── launch
+│   ├── painted.launch  # Launch file for starting painted software only
+│   ├── simulation.launch # Launch file starting simulation and painted software
+│   └── turtlebot.launch # Launch file for initial turtlebot hardware only
+├── package.xml
+├── README.md
+├── scripts # Test files for testing services, subject to remove but feel free to learn how to service work from it
+│   ├── add_two_ints_client.py
+│   └── add_two_ints_server.py
+├── src
+│   ├── control.py # Control node(completed)
+│   ├── execute.py # Execute node(WIP)
+│   ├── move.py # demo1 movement file
+│   ├── move_test.py # demo1 movement file
+│   └── slam_data_json_output.py # Script for outputing /map data into json file
+└── srv #Folder for all service messages
+    ├── AddTwoInts.srv # Test file, subject to remove
+    └── ControlCommand.srv # Control node service msg define
+
+6 directories, 15 files
+```
 
 ## Useful command and QA
 1. Uploading code into turtlebot
   ```
-  scp -r ~/catkin_ws/src/painted pi@tentacool:~/catkin_ws/src
+scp -r ~/catkin_ws/src/painted pi@tentacool:~/catkin_ws/src
   ```
 
 2. Error: Can't import painted.srv
@@ -65,5 +102,5 @@ Now you should see gazebo running and painted software started.
   - try source setup file again
   
   ```
-  source ~/catkin_ws/devel/setup.bash
+source ~/catkin_ws/devel/setup.bash
   ```
