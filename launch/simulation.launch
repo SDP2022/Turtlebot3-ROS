@@ -5,4 +5,6 @@
   <env name="TURTLEBOT3_MODEL" value="BURGER" />
   <include file="$(find turtlebot3_gazebo)/launch/turtlebot3_empty_world.launch"/>
   <node name="control" pkg="painted" type="control.py" output="screen"/>
+  <node name="master" pkg="painted" type="master.py" output="screen"/>
+
 </launch>
