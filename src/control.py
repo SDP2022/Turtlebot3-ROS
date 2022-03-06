@@ -35,11 +35,11 @@ class control_node():
         # Initial transform
         self.initial_transform()
 
-        self.log_info("Starting control_node service")
+        self.log_info("Starting %s service" % (NAME))
 
     def shutdown(self):
         # stop turtlebot
-        self.log_info("Stopping move node")
+        self.log_info("Stopping %s node" % (NAME))
         self.cmd_vel.publish(Twist())
         self.log_info("Stop message publish success")
 
@@ -174,7 +174,7 @@ class control_node():
 
 
 if __name__ == "__main__":
-    rospy.loginfo("Starting control_node service")
+    rospy.loginfo("Starting %s service" % (NAME))
     control_node()
     rospy.spin()
     # try:
