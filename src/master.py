@@ -1,4 +1,4 @@
-#!/usr/bin/env python3
+#!/usr/bin/env python
 from distutils.archive_util import make_archive
 import rospy
 import json
@@ -6,7 +6,7 @@ from std_msgs.msg import String
 # from painted.srv import *
 
 class master:
-    def __init__(self) -> None:
+    def __init__(self):
         rospy.init_node('master', anonymous=True)
         self.pub_web = rospy.Publisher('web_messages', String, queue_size=10)
 
