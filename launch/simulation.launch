@@ -4,7 +4,7 @@
   <env name="ROS_HOTNAME" value="$HOSTNAME" />
   <env name="TURTLEBOT3_MODEL" value="BURGER" />
   <include file="$(find turtlebot3_gazebo)/launch/turtlebot3_empty_world.launch"/>
-  <node name="control" pkg="painted" type="control.py" output="screen"/>
-  <node name="master" pkg="painted" type="master.py" output="screen"/>
-  <node name="pen" pkg="painted" type="pen.py" output="screen"/>
+  <node name="control" pkg="painted" type="control.py" output="screen" respawn="true"/>
+  <node name="master" pkg="painted" type="master.py" output="screen" respawn="true"/>
+  <node name="pen" pkg="painted" type="pen.py" output="screen" respawn="true"/>
 </launch>
