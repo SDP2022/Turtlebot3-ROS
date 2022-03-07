@@ -10,6 +10,7 @@ from std_msgs.msg import String
 try:
     from motors import Motors
     SIM_ENV = False
+    print('Turtlebot environment detected, enable motor api')
 except ImportError:
     print('Sim environment detected, disable motor api')
     SIM_ENV = True
@@ -36,6 +37,8 @@ class pen_node():
 
         if SIM_ENV:
             rospy.logwarn("[{0}]{1}".format(NAME, 'SIM MODE ON'))
+        else:
+            rospy.logwarn("[{0}]{1}".format(NAME, 'SIM MODE OFF'))
 
     def pen_command_callback(self, req):
         command_pen_status = req.pen_down
