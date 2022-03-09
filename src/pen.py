@@ -44,7 +44,7 @@ class pen_node():
         command_pen_status = req.pen_down
         self.log_info("command_pen_status=%s self.pen_down_status=%s" %
                       (command_pen_status, self.pen_down_status))
-        if command_pen_status and self.pen_down_status:
+        if command_pen_status == self.pen_down_status:
             self.log_info("Statue same, wont execute")
             return False
         if command_pen_status:
