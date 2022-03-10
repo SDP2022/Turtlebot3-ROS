@@ -1,7 +1,7 @@
 # Turtlebot3-ROS
 University of Edinburgh SDP 2022 Gourp15 Turtlebot3 ROS Codebase
 #### This repo and readme are currently managed and monitored by Ivan Zhong, pin me if readme doesn't work.
-#### Last update: 18:06 6, March
+#### Last update: 16:24 10, March
 
 ![IMG_0837](https://user-images.githubusercontent.com/16554153/156164482-addfe0e1-b855-40ec-a639-04a393f34f06.jpeg)
 
