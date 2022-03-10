@@ -63,9 +63,20 @@ SSH into robot and launch painted software:
 ```
 ssh -XC pi@tentacool
 (password: turtlebot)
-cd ~/catkin_ws
-roslaunch src/painted/launch/painted.launch
+roslaunch painted painted.launch
 ```
+This will start rosecore, turtlebot3_bringup and painted software together.
+Don't worry if you see control_node can't find transform when starting, its due to turtlebot3 intial process's delay.
+
+If you would like to run node on the dice machine and connect it to the ros master in turtlebot. 
+
+Remeber to add TURTLEBOT3_MODEL, ROS_MASTER_URI and ROS_HOSTNAME into your DICE bashrc file.
+```
+export TURTLEBOT3_MODEL=burger
+export ROS_MASTER_URI=http://tentacool:11311
+export ROS_HOSTNAME=$HOSTNAME
+```
+
 
 ## Repo structure
 
