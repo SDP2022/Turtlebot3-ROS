@@ -68,6 +68,7 @@ add_service_files(
   PenCommand.srv
   TransformToGeoJsonCommand.srv
   TransformToRobotCommand.srv
+  ExecuteCommand.srv
 )
 
 ## Generate actions in the 'action' folder
@@ -217,6 +218,6 @@ include_directories(
 ## Add folders to be run by python nosetests
 # catkin_add_nosetests(test)
 
-catkin_install_python(PROGRAMS scripts/add_two_ints_server.py scripts/add_two_ints_client.py src/control.py src/execute_demo.py src/master.py src/pen.py src/transform.py
+catkin_install_python(PROGRAMS scripts/add_two_ints_server.py scripts/add_two_ints_client.py src/control.py src/execute_demo.py src/master.py src/pen.py src/transform.py src/execute.py
   DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
 )
