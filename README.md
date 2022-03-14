@@ -1,7 +1,7 @@
 # Turtlebot3-ROS
 University of Edinburgh SDP 2022 Gourp15 Turtlebot3 ROS Codebase
 #### This repo and readme are currently managed and monitored by Ivan Zhong, pin me if readme doesn't work.
-#### Last update: 18:06 6, March
+#### Last update: 16:24 10, March
 
 ![IMG_0837](https://user-images.githubusercontent.com/16554153/156164482-addfe0e1-b855-40ec-a639-04a393f34f06.jpeg)
 
@@ -63,9 +63,20 @@ SSH into robot and launch painted software:
 ```
 ssh -XC pi@tentacool
 (password: turtlebot)
-cd ~/catkin_ws
-roslaunch src/painted/launch/painted.launch
+roslaunch painted painted.launch
 ```
+This will start rosecore, turtlebot3_bringup and painted software together.
+Don't worry if you see control_node can't find transform when starting, its due to turtlebot3 intial process's delay.
+
+If you would like to run node on the dice machine and connect it to the ros master in turtlebot. 
+
+Remeber to add TURTLEBOT3_MODEL, ROS_MASTER_URI and ROS_HOSTNAME into your DICE bashrc file.
+```
+export TURTLEBOT3_MODEL=burger
+export ROS_MASTER_URI=http://tentacool:11311
+export ROS_HOSTNAME=$HOSTNAME
+```
+
 
 ## Repo structure
 
