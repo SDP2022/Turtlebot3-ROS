@@ -7,6 +7,10 @@ import math
 from geometry_msgs.msg import Twist, Point, Quaternion
 from nav_msgs.msg import Odometry
 from std_msgs.msg import String
+from move_base_msgs.msg import MoveBaseAction, MoveBaseGoal
+import actionlib
+from actionlib_msgs.msg import *
+from geometry_msgs.msg import Pose, Point, Quaternion
 
 NAME = 'execute_node'
 
@@ -18,8 +22,12 @@ class execute_node():
 
         self.execute_service = rospy.Service(
             'execute_service', ExecuteCommand, self.execute_command_callback)
-
+        self.move_base = actionlib.SimpleActionClient("move_base", MoveBaseAction)
+        self.move_base.wait_for_server(rospy.Duration(5))
         self.log_info("Starting %s service" % (NAME))
+        position = {'x': 1.22, 'y' : 2.56}
+        quaternion = {'r1' : 0.000, 'r2' : 0.000, 'r3' : 0.000, 'r4' : 1.000}
+        self.goto(position, quaternion)
 
     def execute_command_callback(self, req):
         f_lines = open("test.json")
@@ -66,7 +74,7 @@ class execute_node():
                 A_moves.append(curr_move)  
         return A_moves
 
-    def calc_end_pos(A_moves, start_pos): #takes moves and a start pos to calculate where the last position is (continuous)
+    def calc_end_pos(self, A_moves, start_pos): #takes moves and a start pos to calculate where the last position is (continuous)
         curr_pos = start_pos
         for move in A_moves:
             sin_angle = math.sin(math.radians(move[1]))
@@ -75,11 +83,11 @@ class execute_node():
         return curr_pos
 
 
-    def calc_end_angle(A_moves): #finds total direction change over one drawing attempt TODO
+    def calc_end_angle(self, A_moves): #finds total direction change over one drawing attempt TODO
         return
             
 
-    def calc_path_to(prev_end, start_pos, start_angle): 
+    def calc_path_to(self, prev_end, start_pos, start_angle): 
         x_dist = int(start_pos[0]) - int(prev_end[0])
         y_dist = int(start_pos[1]) - int(prev_end[1]) #forces a round down
         angle_rad = math.atan(y_dist/x_dist)
@@ -87,6 +95,34 @@ class execute_node():
         dist = math.sqrt(x_dist^2 + y_dist^2)
 
         return tuple([dist,angle_degrees])
+
+    def goto(self, pos, quat):
+
+        # Send a goal
+        self.goal_sent = True
+        goal = MoveBaseGoal()
+        goal.target_pose.header.frame_id = 'map'
+        goal.target_pose.header.stamp = rospy.Time.now()
+        goal.target_pose.pose = Pose(Point(pos['x'], pos['y'], 0.000),
+                                     Quaternion(quat['r1'], quat['r2'], quat['r3'], quat['r4']))
+
+        # Start moving
+        self.move_base.send_goal(goal)
+
+        # Allow TurtleBot up to 60 seconds to complete task
+        success = self.move_base.wait_for_result(rospy.Duration(60)) 
+
+        state = self.move_base.get_state()
+        result = False
+
+        if success and state == GoalStatus.SUCCEEDED:
+            # We made it!
+            result = True
+        else:
+            self.move_base.cancel_goal()
+
+        self.goal_sent = False
+        return result
 
     def shutdown(self):
         # stop turtlebot, reset
