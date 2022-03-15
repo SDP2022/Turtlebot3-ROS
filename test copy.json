@@ -4,23 +4,35 @@
             "starting_pos": "0.39740955413650014, 0.6346701992920721",
             "drawing_plan": [
                 {
-                    "move": 0.8,
+                    "move": 0.5,
+                    "rotate": -1
+                },
+                {
+                    "move": -0.2,
                     "rotate": -1
                 },
                 {
                     "move": -1,
-                    "rotate": 90
+                    "rotate": 120
                 },
                 {
-                    "move": 0.1,
+                    "move": -0.2,
+                    "rotate": -1
+                },
+                {
+                    "move": 0.5,
                     "rotate": -1
                 },
                 {
                     "move": -1,
-                    "rotate": 90
+                    "rotate": 120
                 },
                 {
-                    "move": 0.8,
+                    "move": -0.2,
+                    "rotate": -1
+                },
+                {
+                    "move": 0.5,
                     "rotate": -1
                 }
             ]
