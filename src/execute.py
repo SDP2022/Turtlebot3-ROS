@@ -35,6 +35,7 @@ class execute_node():
         self.load_json_demo2()
 
     def execute_command_callback(self, req):
+        self.load_json_demo2()
         return True
 
     def load_json_demo2(self):
@@ -68,8 +69,12 @@ class execute_node():
                     self.log_info('Move %s' % (instruction[0]))
                     self.control_command(instruction[0], 0)
                 else:
+                    self.log_info('Shape: Pen up')
+                    self.pen_command(False)
                     self.log_info('Rotate %s' % (instruction[1]))
                     self.control_command(0, instruction[1])
+                    self.log_info('Shape: Pen down')
+                    self.pen_command(True)
             self.log_info('Shape: Pen up')
             self.pen_command(False)
         self.log_info('Drawing completed')
@@ -108,6 +113,8 @@ class execute_node():
             pen_command = rospy.ServiceProxy('pen_service', PenCommand)
             print("Requesting pen_status=%s"%(pen_status))
             resp1 = pen_command(pen_status)
+            d = rospy.Duration(2, 0)
+            rospy.sleep(d)
             return resp1.status
         except rospy.ServiceException as e:
             print("Service call failed: %s"%e)
