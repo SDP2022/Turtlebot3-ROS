@@ -1,28 +1,31 @@
 {
     "drawingpath": [
         {
-            "starting_pos": "20,20",
+            "starting_pos": "0.39740955413650014, 0.6346701992920721",
             "drawing_plan": [
                 {
-                    "move": 10,
+                    "move": 0.3,
                     "rotate": -1
                 },
                 {
                     "move": -1,
-                    "rotate": -90
-                }
-            ]
-        },
-        {
-            "starting_pos": "40,40",
-            "drawing_plan": [
+                    "rotate": 40.89
+                },
                 {
-                    "move": 20,
+                    "move": 0.3,
                     "rotate": -1
                 },
                 {
                     "move": -1,
-                    "rotate": -270
+                    "rotate": 98.21
+                },
+                {
+                    "move": 0.3,
+                    "rotate": -1
+                },
+                {
+                    "move": -1,
+                    "rotate": 40.89
                 }
             ]
         }
