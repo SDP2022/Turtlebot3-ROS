@@ -44,6 +44,7 @@ class master:
         rospy.sleep(3)
         self.pub_web.publish( self.make_web_message("info", "Imagine the robot is now painting"))
         rospy.sleep(3)
+        self.execute_command()
         self.pub_web.publish(self.make_web_message("success", "Imagine the job is now complete!"))
         
     def make_web_message(self, alert_type, message):
@@ -51,6 +52,15 @@ class master:
             "alert_type" : alert_type,
             "message" : message
         })
+    
+    def execute_command(self):
+        try:
+            execute_command = rospy.ServiceProxy('execute_service', ExecuteCommand)
+            print("Requesting execute")
+            resp1 = execute_command(True)
+            return resp1.status
+        except rospy.ServiceException as e:
+            print("Service call failed: %s"%e)
 
 if __name__ == "__main__":
     rospy.loginfo("LEEEEEROY JENKINS")
