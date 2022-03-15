@@ -1,0 +1,59 @@
+{ 
+
+  "drawingpath": [ 
+
+    { 
+
+      "starting_pos": "20,20", 
+
+      "drawing_plan": [ 
+
+        { 
+
+          "move": 10, 
+
+          "rotate": -1 
+
+        }, 
+
+        { 
+
+          "move": -1, 
+
+          "rotate": -90 
+
+        } 
+
+      ] 
+
+    }, 
+
+    { 
+
+      "starting_pos": "40,40", 
+
+      "drawing_plan": [ 
+
+        { 
+
+          "move": 20, 
+
+          "rotate": -1 
+
+        }, 
+
+        { 
+
+          "move": -1, 
+
+          "rotate": -270 
+
+        } 
+
+      ] 
+
+    } 
+
+  ] 
+
+} 

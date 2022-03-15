@@ -23,31 +23,69 @@ def moveset_iter(all_moves, cat_name): #all_moves is drawing, cat_name is set_ty
 
 def calc_end_pos(A_moves, start_pos): #takes moves and a start pos to calculate where the last position is (continuous)
         curr_pos = start_pos
-
+        curr_x = float(curr_pos[0])
+        curr_y = float(curr_pos[1])
+        total_angle = 0
+        
         for move in A_moves:
-                sin_angle = math.sin(math.radians(move[1]))
-                cos_angle = math.cos(math.radians(move[1]))
+                total_angle = total_angle + move[1]
                 
-                curr_pos = [float(curr_pos[0]) + float(sin_angle*move[0]) , float(curr_pos[0]) + float(cos_angle*move[0])]
-
+                curr_dist = move[0]
+                print("move: " , move)
+                sin_angle = math.sin(math.radians(total_angle))
+                cos_angle = math.cos(math.radians(total_angle))
+                curr_x = curr_x + sin_angle*curr_dist 
+                curr_y = curr_y + cos_angle*curr_dist 
+                
+                print("pos: ", curr_x, curr_y)
+                
+        curr_pos = (curr_x, curr_y)   #rounded 
         return curr_pos
 
 
-def calc_end_angle(A_moves): #finds total direction change over one drawing attempt TODO
-        return
+##def calc_curr_pos(move, prev_pos):
+##        curr_dist = move[0]
+##        sin_angle = math.sin(move[1])
+##        cos_angle = math.cos(move[1])
+##        curr_x = float(prev_pos[0]) + sin_angle*curr_dist #rounded
+##        curr_y = float(prev_pos[1]) + cos_angle*curr_dist #rounded
+##        curr_pos = (curr_x, curr_y)
+##        print(curr_pos)
+##        return curr_pos
+        
+
+
+def calc_end_angle(A_moves, start_angle): #finds total direction change over one drawing attempt TODO
+        
+        curr_angle = start_angle
+
+        for move in A_moves:
+                curr_angle =+ move[1]
+                if curr_angle > 180:
+                        curr_angle = curr_angle - 360
+                elif curr_angle < -180:
+                        curr_angle = curr_angle + 360
+                
+        return curr_angle
+
+def adjust_final(last_pos, angle_from_north):
+        north_move = tuple([0,-1*angle_from_north])
+        return north_move
         
 
 def calc_path_to(prev_end, start_pos, start_angle): 
-        x_dist = int(start_pos[0]) - int(prev_end[0])
-        y_dist = int(start_pos[1]) - int(prev_end[1]) #forces a round down
-        angle_rad = math.atan(y_dist/x_dist)
+        x_dist = float(start_pos[0]) - float(prev_end[0])
+        y_dist = float(start_pos[1]) - float(prev_end[1])
+        if x_dist == 0:
+                angle_rad = 0
+        else:
+                angle_rad = math.atan(y_dist/x_dist)
         angle_degrees = (180*angle_rad) / math.pi
-        dist = math.sqrt(x_dist^2 + y_dist^2)
-
+        dist = math.sqrt((x_dist*x_dist + y_dist*y_dist))
         return tuple([dist,angle_degrees])
 
 
-f_lines = open("test.json")
+f_lines = open("test3.json")
 
 start_pos_test = [0,0]
 
@@ -57,6 +95,7 @@ all_moves = [] #move of all drawings
 A_moves = [] #move of one drawings
 
 last_pos = start_pos_test
+last_angle = 0
 
 #calc_path_to(last_pos, next_pos, 0)
 
@@ -65,28 +104,52 @@ for drawing in lines_data["drawingpath"]: #drawing has 1 startpos and moves
                 print(set_type)
                 if set_type == "drawing_plan":
                         A_moves = moveset_iter(drawing, set_type)
-                if set_type == "starting_pos":
-                        print("Starting position is " + str(drawing[set_type]))
-                        next_pos = drawing[set_type]
-                        connection_path = calc_path_to(last_pos, next_pos, 0)
-
-
-                if set_type == "starting_pos" and len(all_moves) == 0:
-                        all_moves = [connection_path]
-                elif set_type != "starting_pos":    
-                        all_moves.append(A_moves)
-                elif set_type == "starting_pos" and len(all_moves) > 1:
-                        all_moves.append(connection_path)
                         
-        last_pos = calc_end_pos(A_moves, next_pos)
+                if set_type == "starting_pos":
+                        print("Current position is " + str(last_pos))
+                        print("Next starting position is " + str(drawing[set_type]))
+                        next_pos = drawing["starting_pos"].split(",")
+                        connection_path = calc_path_to(last_pos, next_pos, last_angle)
+                last_pos = tuple([0,0])
+                last_angle = 0
 
+                
+                if set_type == "starting_pos":
+                    if len(all_moves) == 0:
+                        all_moves = [connection_path]
+                    else:
+                        all_moves.append(connection_path)
+
+                    last_pos = calc_end_pos([connection_path], last_pos)
+                    #last_angle = calc_end_angle(connection_path, last_angle)
+                    last_angle = connection_path[1]
+                    robot_adjust = adjust_final(last_pos,last_angle)
+                    all_moves.append(robot_adjust)
+                        
+#makes the robot face north before drawing 
+
+                elif set_type != "starting_pos":
+                        for item in A_moves:
+                                all_moves.append(item)
+                    #all_moves.append(A_moves)
+                    
+                        last_pos = calc_end_pos(A_moves, next_pos)
+                        last_angle = calc_end_angle(A_moves, last_angle)
         
 
 print(all_moves)
 
 
+def json_output(list_of_all_moves):
+        named_list = ( ("Drawing") , (list_of_all_moves) )
+        jsonStr = json.dumps(named_list, indent = 4)
+        with open("output.json" , "w") as f:
+                f.write(jsonStr)
 
-#TODO complete calc_end_angle
+json_output(all_moves)
+        
+
+#TODO insert calc_end_angle
 
 
         

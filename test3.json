@@ -1,0 +1,30 @@
+{ 
+  "drawingpath": [ 
+    { 
+      "starting_pos": "10,10", 
+      "drawing_plan": [ 
+        { 
+          "move": 10, 
+          "rotate": 90 
+        }, 
+        { 
+          "move": 10, 
+          "rotate": -90 
+        } 
+      ] 
+    }, 
+    { 
+      "starting_pos": "10,20", 
+      "drawing_plan": [ 
+        { 
+          "move": 20, 
+          "rotate": 90 
+        }, 
+        { 
+          "move": 10, 
+          "rotate": 90
+        } 
+      ] 
+    } 
+  ] 
+} 
