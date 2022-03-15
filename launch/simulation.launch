@@ -7,6 +7,6 @@
   <node name="control" pkg="painted" type="control.py" output="screen" respawn="true"/>
   <node name="master" pkg="painted" type="master.py" output="screen" respawn="true"/>
   <node name="pen" pkg="painted" type="pen.py" output="screen" respawn="true"/>
-  <node name="execute" pkg="painted" type="pen.py" output="screen" respawn="true"/>
-  <node name="transform" pkg="painted" type="pen.py" output="screen" respawn="true"/>
+  <node name="execute" pkg="painted" type="execute.py" output="screen" respawn="true"/>
+  <node name="transform" pkg="painted" type="transform.py" output="screen" respawn="true"/>
 </launch>
