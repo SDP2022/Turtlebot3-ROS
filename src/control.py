@@ -75,8 +75,13 @@ class control_node():
         return ControlCommandResponse(False)
 
     def move(self, goal_distance):
-        move_cmd = Twist()
-        move_cmd.linear.x = self.linear_vel
+        if goal_distance < 0:
+            goal_distance = -goal_distance
+            move_cmd = Twist()
+            move_cmd.linear.x = -self.linear_vel
+        else:
+            move_cmd = Twist()
+            move_cmd.linear.x = self.linear_vel
 
         r = rospy.Rate(20)
         r.sleep()
