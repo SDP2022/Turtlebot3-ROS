@@ -39,7 +39,7 @@ def calc_end_pos(A_moves, start_pos): #takes moves and a start pos to calculate 
                 
                 print("pos: ", curr_x, curr_y)
                 
-        curr_pos = (int(curr_x), int(curr_y))   #rounded 
+        curr_pos = (curr_x, curr_y)   #rounded 
         return curr_pos
 
 
@@ -74,8 +74,8 @@ def adjust_final(last_pos, angle_from_north):
         
 
 def calc_path_to(prev_end, start_pos, start_angle): 
-        x_dist = int(start_pos[0]) - int(prev_end[0])
-        y_dist = int(start_pos[1]) - int(prev_end[1]) #forces a round down
+        x_dist = float(start_pos[0]) - float(prev_end[0])
+        y_dist = float(start_pos[1]) - float(prev_end[1])
         if x_dist == 0:
                 angle_rad = 0
         else:
