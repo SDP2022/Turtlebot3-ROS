@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 
-from re import T
+from re import S, T
 from painted.srv import *
 import rospy
 import json
@@ -23,117 +23,102 @@ class execute_node():
 
         self.execute_service = rospy.Service(
             'execute_service', ExecuteCommand, self.execute_command_callback)
-        self.move_base = actionlib.SimpleActionClient("move_base", MoveBaseAction)
+        self.move_base = actionlib.SimpleActionClient(
+            "move_base", MoveBaseAction)
         self.move_base.wait_for_server(rospy.Duration(5))
+        rospy.wait_for_service('pen_service')
+        rospy.wait_for_service('control_service')
         self.log_info("Starting %s service" % (NAME))
         # position = {'x': 0.5, 'y' : 0.5}
         # quaternion = {'r1' : 0.000, 'r2' : 0.000, 'r3' : 0.000, 'r4' : 1.000}
         # self.goto(position, quaternion)
-        self.load_json()
+        self.load_json_demo2()
 
     def execute_command_callback(self, req):
-        f_lines = open("~/catkin_ws/src/painted/test.json")
-        start_pos_test = [0,0]
-        lines_data = json.load(f_lines)
-        all_moves = [] #move of all drawings
-        A_moves = [] #move of one drawings
-        last_pos = start_pos_test
-        #calc_path_to(last_pos, next_pos, 0)
-        for drawing in lines_data["drawingpath"]: #drawing has 1 startpos and moves
-            for set_type in drawing: #set_type is either startpos or drawing plan
-                print(set_type)
-                if set_type == "drawing_plan":
-                        A_moves = self.moveset_iter(drawing, set_type)
-                if set_type == "starting_pos":
-                        print("Starting position is " + str(drawing[set_type]))
-                        next_pos = drawing[set_type]
-                        connection_path = self.calc_path_to(last_pos, next_pos, 0)
-                if set_type == "starting_pos" and len(all_moves) == 0:
-                        all_moves = [connection_path]
-                elif set_type != "starting_pos":    
-                        all_moves.append(A_moves)
-                elif set_type == "starting_pos" and len(all_moves) > 1:
-                        all_moves.append(connection_path)
-            last_pos = self.calc_end_pos(A_moves, next_pos)
-        
         return True
 
-    def load_json(self):
+    def load_json_demo2(self):
         f_lines = open("./test.json")
-        start_pos_test = [0,0]
         lines_data = json.load(f_lines)
-        all_moves = [] #move of all drawings
-        A_moves = [] #move of one drawings
-        starting_pos = [] #all starting position
+        starting_pos = []  # all starting position
         drawing_instruction = []
-        last_pos = start_pos_test
-        #calc_path_to(last_pos, next_pos, 0)
-        for drawing in lines_data["drawingpath"]: #drawing has 1 startpos and moves
-            for set_type in drawing: #set_type is either startpos or drawing plan
-                print(set_type)
+        # drawing has 1 startpos and moves
+        for drawing in lines_data["drawingpath"]:
+            for set_type in drawing:  # set_type is either startpos or drawing plan
                 if set_type == "drawing_plan":
-                        A_moves = self.moveset_iter(drawing, set_type)
-                        drawing_instruction.append(self.moveset_iter(drawing, set_type))
-                if set_type == "starting_pos":
-                        print("Starting position is " + str(drawing[set_type]))
-                        next_pos = drawing[set_type]
-                        connection_path = self.calc_path_to(last_pos, next_pos, 0)
-                        starting_pos.append(drawing[set_type])
-                if set_type == "starting_pos" and len(all_moves) == 0:
-                        all_moves = [connection_path]
-                elif set_type != "starting_pos":    
-                        all_moves.append(A_moves)
-                elif set_type == "starting_pos" and len(all_moves) > 1:
-                        all_moves.append(connection_path)
-            last_pos = self.calc_end_pos(A_moves, next_pos)
+                    drawing_instruction.append(
+                        self.moveset_iter(drawing, set_type))
+                elif set_type == "starting_pos":
+                    print("Starting position is " + str(drawing[set_type]))
+                    start_pos = str(drawing[set_type])
+                    print(start_pos)
+                    start_pos = start_pos.split(',')
+                    starting_pos.append((float(start_pos[0]), float(start_pos[1])))
         self.log_info(starting_pos)
         self.log_info(drawing_instruction)
+        self.log_info('Json loaded, start drawing')
+        for i in range(len(starting_pos)):
+            next_shape_starting_pos = starting_pos[i]
+            self.log_info('Shape: Goto %s ' % (str(next_shape_starting_pos)))
+            # self.goto(next_shape_starting_pos[0], next_shape_starting_pos[1])
+            self.log_info('Shape: Pen down')
+            self.pen_command(True)
+            for instruction in drawing_instruction[i]:
+                if instruction[0] != -1:
+                    self.log_info('Move %s' % (instruction[0]))
+                    self.control_command(instruction[0], 0)
+                else:
+                    self.log_info('Rotate %s' % (instruction[1]))
+                    self.control_command(0, instruction[1])
+            self.log_info('Shape: Pen up')
+            self.pen_command(False)
+        self.log_info('Drawing completed')
 
-    def moveset_iter(self, all_moves, cat_name): #all_moves is drawing, cat_name is set_type
+    # all_moves is drawing, cat_name is set_type
+    def moveset_iter(self, all_moves, cat_name):
         A_moves = []
-        for move in all_moves[cat_name]: #move contains one distance and one angle
+        for move in all_moves[cat_name]:  # move contains one distance and one angle
             curr_dist = 0
             curr_angle = 0
-            for move_type in move: #movetype is either angle or distance
+            for move_type in move:  # movetype is either angle or distance
                 if move_type == "move":
                     curr_dist = move[move_type]
                     print("We must move " + str(curr_dist))
                 elif move_type == "rotate":
                     curr_angle = move[move_type]
                     print("We must rotate " + str(curr_angle))
-            curr_move = tuple([curr_dist,curr_angle])
+            curr_move = tuple([curr_dist, curr_angle])
             if len(A_moves) == 0:
                 A_moves = [curr_move]
             else:
-                A_moves.append(curr_move)  
+                A_moves.append(curr_move)
         return A_moves
 
-    def calc_end_pos(self, A_moves, start_pos): #takes moves and a start pos to calculate where the last position is (continuous)
-        curr_pos = start_pos
-        for move in A_moves:
-            sin_angle = math.sin(math.radians(move[1]))
-            cos_angle = math.cos(math.radians(move[1]))
-            curr_pos = [float(curr_pos[0]) + float(sin_angle*move[0]) , float(curr_pos[0]) + float(cos_angle*move[0])]
-        return curr_pos
+    def control_command(self, displacement, rotation):
+        try:
+            control_command = rospy.ServiceProxy('control_service', ControlCommand)
+            print("Requesting displacement=%s rotation=%s"%(displacement, rotation))
+            resp1 = control_command(displacement, rotation)
+            return resp1.status
+        except rospy.ServiceException as e:
+            print("Service call failed: %s"%e)
 
+    def pen_command(self, pen_status):
+        try:
+            pen_command = rospy.ServiceProxy('pen_service', PenCommand)
+            print("Requesting pen_status=%s"%(pen_status))
+            resp1 = pen_command(pen_status)
+            return resp1.status
+        except rospy.ServiceException as e:
+            print("Service call failed: %s"%e)
 
-    def calc_end_angle(self, A_moves): #finds total direction change over one drawing attempt TODO
-        return
-            
+    def goto(self, x, y):
+        pos = {'x': x, 'y' : y}
+        quat = {'r1' : 0.000, 'r2' : 0.000, 'r3' : 0.000, 'r4' : 1.000}
 
-    def calc_path_to(self, prev_end, start_pos, start_angle): 
-        x_dist = int(start_pos[0]) - int(prev_end[0])
-        y_dist = int(start_pos[1]) - int(prev_end[1]) #forces a round down
-        angle_rad = math.atan(y_dist/x_dist)
-        angle_degrees = (180*angle_rad) / math.pi
-        dist = math.sqrt(x_dist^2 + y_dist^2)
-
-        return tuple([dist,angle_degrees])
-
-    def goto(self, pos, quat):
-        self.log_info('staring goto pos={0} quat={1}'.format(pos, quat))
+        self.log_info('Requesting goto pos={0} quat={1}'.format(pos, quat))
         # Send a goal
-        self.goal_sent = True
+        # self.goal_sent = True
         goal = MoveBaseGoal()
         goal.target_pose.header.frame_id = 'map'
         goal.target_pose.header.stamp = rospy.Time.now()
@@ -142,11 +127,11 @@ class execute_node():
 
         # Start moving
         self.move_base.send_goal(goal)
-        self.log_info('goal send')
+        self.log_info('Goal send')
 
         # Allow TurtleBot up to 60 seconds to complete task
-        success = self.move_base.wait_for_result(rospy.Duration(60)) 
-        self.log_info('waiting result')
+        success = self.move_base.wait_for_result(rospy.Duration(60))
+        self.log_info('Waiting result')
 
         state = self.move_base.get_state()
         result = False
@@ -154,14 +139,14 @@ class execute_node():
         print(state)
 
         if success and state == GoalStatus.SUCCEEDED:
-            self.log_info('success')
+            self.log_info('Goal success')
             # We made it!
             result = True
         else:
-            self.log_info('failed')
+            self.log_info('Goal Failed')
             self.move_base.cancel_goal()
         self.log_info(result)
-        self.goal_sent = False
+        # self.goal_sent = False
         return result
 
     def shutdown(self):
