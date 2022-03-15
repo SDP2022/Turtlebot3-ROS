@@ -1,5 +1,6 @@
 #!/usr/bin/env python
 
+from re import T
 from painted.srv import *
 import rospy
 import json
@@ -25,12 +26,13 @@ class execute_node():
         self.move_base = actionlib.SimpleActionClient("move_base", MoveBaseAction)
         self.move_base.wait_for_server(rospy.Duration(5))
         self.log_info("Starting %s service" % (NAME))
-        position = {'x': 1.22, 'y' : 2.56}
-        quaternion = {'r1' : 0.000, 'r2' : 0.000, 'r3' : 0.000, 'r4' : 1.000}
-        self.goto(position, quaternion)
+        # position = {'x': 0.5, 'y' : 0.5}
+        # quaternion = {'r1' : 0.000, 'r2' : 0.000, 'r3' : 0.000, 'r4' : 1.000}
+        # self.goto(position, quaternion)
+        self.load_json()
 
     def execute_command_callback(self, req):
-        f_lines = open("test.json")
+        f_lines = open("~/catkin_ws/src/painted/test.json")
         start_pos_test = [0,0]
         lines_data = json.load(f_lines)
         all_moves = [] #move of all drawings
@@ -53,7 +55,39 @@ class execute_node():
                 elif set_type == "starting_pos" and len(all_moves) > 1:
                         all_moves.append(connection_path)
             last_pos = self.calc_end_pos(A_moves, next_pos)
+        
         return True
+
+    def load_json(self):
+        f_lines = open("./test.json")
+        start_pos_test = [0,0]
+        lines_data = json.load(f_lines)
+        all_moves = [] #move of all drawings
+        A_moves = [] #move of one drawings
+        starting_pos = [] #all starting position
+        drawing_instruction = []
+        last_pos = start_pos_test
+        #calc_path_to(last_pos, next_pos, 0)
+        for drawing in lines_data["drawingpath"]: #drawing has 1 startpos and moves
+            for set_type in drawing: #set_type is either startpos or drawing plan
+                print(set_type)
+                if set_type == "drawing_plan":
+                        A_moves = self.moveset_iter(drawing, set_type)
+                        drawing_instruction.append(self.moveset_iter(drawing, set_type))
+                if set_type == "starting_pos":
+                        print("Starting position is " + str(drawing[set_type]))
+                        next_pos = drawing[set_type]
+                        connection_path = self.calc_path_to(last_pos, next_pos, 0)
+                        starting_pos.append(drawing[set_type])
+                if set_type == "starting_pos" and len(all_moves) == 0:
+                        all_moves = [connection_path]
+                elif set_type != "starting_pos":    
+                        all_moves.append(A_moves)
+                elif set_type == "starting_pos" and len(all_moves) > 1:
+                        all_moves.append(connection_path)
+            last_pos = self.calc_end_pos(A_moves, next_pos)
+        self.log_info(starting_pos)
+        self.log_info(drawing_instruction)
 
     def moveset_iter(self, all_moves, cat_name): #all_moves is drawing, cat_name is set_type
         A_moves = []
@@ -97,7 +131,7 @@ class execute_node():
         return tuple([dist,angle_degrees])
 
     def goto(self, pos, quat):
-
+        self.log_info('staring goto pos={0} quat={1}'.format(pos, quat))
         # Send a goal
         self.goal_sent = True
         goal = MoveBaseGoal()
@@ -108,19 +142,25 @@ class execute_node():
 
         # Start moving
         self.move_base.send_goal(goal)
+        self.log_info('goal send')
 
         # Allow TurtleBot up to 60 seconds to complete task
         success = self.move_base.wait_for_result(rospy.Duration(60)) 
+        self.log_info('waiting result')
 
         state = self.move_base.get_state()
         result = False
 
+        print(state)
+
         if success and state == GoalStatus.SUCCEEDED:
+            self.log_info('success')
             # We made it!
             result = True
         else:
+            self.log_info('failed')
             self.move_base.cancel_goal()
-
+        self.log_info(result)
         self.goal_sent = False
         return result
 
