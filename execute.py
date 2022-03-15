@@ -85,7 +85,7 @@ def calc_path_to(prev_end, start_pos, start_angle):
         return tuple([dist,angle_degrees])
 
 
-f_lines = open("test.json")
+f_lines = open("test3.json")
 
 start_pos_test = [0,0]
 
@@ -140,6 +140,14 @@ for drawing in lines_data["drawingpath"]: #drawing has 1 startpos and moves
 print(all_moves)
 
 
+def json_output(list_of_all_moves):
+        named_list = ( ("Drawing") , (list_of_all_moves) )
+        jsonStr = json.dumps(named_list, indent = 4)
+        with open("output.json" , "w") as f:
+                f.write(jsonStr)
+
+json_output(all_moves)
+        
 
 #TODO insert calc_end_angle
 
