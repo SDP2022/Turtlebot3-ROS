@@ -54,7 +54,7 @@ class pen_node():
         return True
 
     def pen_down(self):
-        r = rospy.Rate(5)
+        r = rospy.Rate(2.2)
         self.log_info('Execute pen_down with id=%i speed=%i' %
                       (self.motor_id, -self.speed))
         if not SIM_ENV:
@@ -66,7 +66,7 @@ class pen_node():
                       (self.pen_down_status))
 
     def pen_up(self):
-        r = rospy.Rate(5)
+        r = rospy.Rate(2.2)
         self.log_info('Execute pen_up with id=%i speed=%i' %
                       (self.motor_id, self.speed))
         if not SIM_ENV:
