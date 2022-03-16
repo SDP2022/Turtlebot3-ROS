@@ -9,20 +9,10 @@ class master:
     def __init__(self):
         rospy.init_node('master', anonymous=True)
         self.pub_web = rospy.Publisher('web_messages', String, queue_size=10)
-
-        rate = rospy.Rate(1000)
-        while not rospy.is_shutdown():
-            self.pub_web.publish(self.make_web_message("success", "PaintBot is ready to go! "))
-            
-        #     self.pub_web.publish(self.make_web_message("success", "hello world " + str(rospy.get_time())))
-            rate.sleep()
-
+        self.pub_web.publish(self.make_web_message("success", "PaintBot is ready to go! "))
         self.sub_job = rospy.Subscriber('start_job', String, self.job_callback)
 
-
-
     def job_callback(self, data):
-
         #testing a hypothetical situation
         #not currently using messages, just sending string of JSON
         rospy.loginfo("job received")
@@ -31,12 +21,13 @@ class master:
         user_data = json.loads(data.data)
         geoJSON = user_data['geoJSON'] #eg in future
         rospy.loginfo(data.data)
-    
-        rospy.sleep(3)
+        #TODO Feed geojson into execution
+        self.pub_web.publish( self.make_web_message("success", "Job planning successs."))
+
         self.pub_web.publish( self.make_web_message("info", "PaintBot is now executing the job."))
-        rospy.sleep(3)
         self.execute_command()
-        self.pub_web.publish(self.make_web_message("success", "The job is now complete!"))
+
+        self.pub_web.publish(self.make_web_message("success", "Job is now complete!"))
         
     def make_web_message(self, alert_type, message):
         return json.dumps({
