@@ -37,22 +37,22 @@ class execute_node():
     def control_command(self, displacement, rotation):
         try:
             control_command = rospy.ServiceProxy('control_service', ControlCommand)
-            print("Requesting displacement=%s rotation=%s"%(displacement, rotation))
+            self.log_info("Requesting displacement=%s rotation=%s"%(displacement, rotation))
             resp1 = control_command(displacement, rotation)
             return resp1.status
         except rospy.ServiceException as e:
-            print("Service call failed: %s"%e)
+            rospy.logerr("Service call failed: %s"%e)
 
     def pen_command(self, pen_status):
         try:
             pen_command = rospy.ServiceProxy('pen_service', PenCommand)
-            print("Requesting pen_status=%s"%(pen_status))
+            self.log_info("Requesting pen_status=%s"%(pen_status))
             resp1 = pen_command(pen_status)
             d = rospy.Duration(2, 0)
             rospy.sleep(d)
             return resp1.status
         except rospy.ServiceException as e:
-            print("Service call failed: %s"%e)
+            rospy.logerr("Service call failed: %s"%e)
 
     def goto(self, x, y, direction):
         pos = {'x': x, 'y' : y}
