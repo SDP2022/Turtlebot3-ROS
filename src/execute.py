@@ -42,13 +42,13 @@ class execute_node():
         return True
 
     def demo2_with_manual_slam(self):
-        self.goto(-1, -0.5)
+        self.goto(0.65, 0)
         # self.pen_command(True)
-        self.control_command(2, 0)
+        self.control_command(0.5, 0)
         # self.pen_command(False)
-        self.goto(-1, -0.4)
+        self.goto(0.65, -0.15)
         # self.pen_command(True)
-        self.control_command(2, 0)
+        self.control_command(0.5, 0)
         # self.pen_command(False)
         
     def load_json_demo2(self):
@@ -134,7 +134,7 @@ class execute_node():
 
     def goto(self, x, y):
         pos = {'x': x, 'y' : y}
-        quat = {'r1' : 0.000, 'r2' : 0.000, 'r3' : 0.000, 'r4' : 1.000}
+        quat = {'r1' : 0.000, 'r2' : 0.000, 'r3' : 0.000, 'r4' : -1.000}
 
         self.log_info('Requesting goto pos={0} quat={1}'.format(pos, quat))
         # Send a goal
