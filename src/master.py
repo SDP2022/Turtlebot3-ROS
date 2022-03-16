@@ -3,7 +3,7 @@ from distutils.archive_util import make_archive
 import rospy
 import json
 from std_msgs.msg import String
-# from painted.srv import *
+from painted.srv import *
 
 class master:
     def __init__(self):

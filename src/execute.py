@@ -33,23 +33,23 @@ class execute_node():
         # quaternion = {'r1' : 0.000, 'r2' : 0.000, 'r3' : 0.000, 'r4' : 1.000}
         # self.goto(position, quaternion)
         # self.load_json_demo2()
-        self.demo2_with_manual_slam()
+        # self.demo2_with_manual_slam()
 
     def execute_command_callback(self, req):
         # self.load_json_demo2()
         self.log_info('starting demo2')
-        self.demo2_with_manual_slam()
+        # self.demo2_with_manual_slam()
         return True
 
     def demo2_with_manual_slam(self):
-        self.goto(0.65, 0)
-        # self.pen_command(True)
-        self.control_command(0.5, 0)
-        # self.pen_command(False)
-        self.goto(0.65, -0.15)
-        # self.pen_command(True)
-        self.control_command(0.5, 0)
-        # self.pen_command(False)
+        self.goto(0.5, -0.25)
+        self.pen_command(True)
+        self.control_command(0.2, 0)
+        self.pen_command(False)
+        self.goto(0.5, -0.3)
+        self.pen_command(True)
+        self.control_command(0.2, 0)
+        self.pen_command(False)
         
     def load_json_demo2(self):
         f_lines = open("./test.json")
@@ -134,7 +134,7 @@ class execute_node():
 
     def goto(self, x, y):
         pos = {'x': x, 'y' : y}
-        quat = {'r1' : 0.000, 'r2' : 0.000, 'r3' : 0.000, 'r4' : -1.000}
+        quat = {'r1' : 0.000, 'r2' : 0.000, 'r3' : 0.000, 'r4' : 1.000}
 
         self.log_info('Requesting goto pos={0} quat={1}'.format(pos, quat))
         # Send a goal
