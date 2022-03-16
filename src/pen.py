@@ -32,7 +32,7 @@ class pen_node():
         self.motor_id = 2
         self.speed = 100  # forward = positive, backwards = negative
         self.pen_down_status = False  # inital pen status is up
-
+        self.pen_running = False # For perventing multiple pen executing 
         self.log_info("Starting %s service" % (NAME))
 
         if SIM_ENV:
@@ -41,6 +41,10 @@ class pen_node():
             rospy.logwarn("[{0}]{1}".format(NAME, 'SIM MODE OFF'))
 
     def pen_command_callback(self, req):
+        if self.pen_running is True:
+            return False
+        else:
+            self.pen_running = True
         command_pen_status = req.pen_down
         self.log_info("command_pen_status=%s self.pen_down_status=%s" %
                       (command_pen_status, self.pen_down_status))
@@ -51,6 +55,7 @@ class pen_node():
             self.pen_down()
         else:
             self.pen_up()
+        self.pen_running = False
         return True
 
     def pen_down(self):
