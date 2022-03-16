@@ -63,7 +63,6 @@ find_package(catkin REQUIRED COMPONENTS
 ## Generate services in the 'srv' folder
 add_service_files(
   FILES
-  AddTwoInts.srv
   ControlCommand.srv
   PenCommand.srv
   TransformToGeoJsonCommand.srv
@@ -218,6 +217,6 @@ include_directories(
 ## Add folders to be run by python nosetests
 # catkin_add_nosetests(test)
 
-catkin_install_python(PROGRAMS scripts/add_two_ints_server.py scripts/add_two_ints_client.py src/control.py src/execute_demo.py src/master.py src/pen.py src/transform.py src/execute.py
+catkin_install_python(PROGRAMS src/control.py src/master.py src/pen.py src/transform.py src/execute.py
   DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
 )
