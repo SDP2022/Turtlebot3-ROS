@@ -33,7 +33,7 @@ class execute_node():
         # quaternion = {'r1' : 0.000, 'r2' : 0.000, 'r3' : 0.000, 'r4' : 1.000}
         # self.goto(position, quaternion)
         # self.load_json_demo2()
-        # self.demo2_with_manual_slam()
+        self.demo2_with_manual_slam()
 
     def execute_command_callback(self, req):
         # self.load_json_demo2()
@@ -42,15 +42,15 @@ class execute_node():
         return True
 
     def demo2_with_manual_slam(self):
-        self.goto(0.3, 0.2)
-        self.pen_command(True)
-        self.goto(0.3, 0.8)
-        self.pen_command(False)
-        self.goto(0.4, 0.2)
-        self.pen_command(True)
-        self.goto(0.4, 0.8)
-        self.pen_command(False)
-
+        self.goto(-1, -0.5)
+        # self.pen_command(True)
+        self.control_command(2, 0)
+        # self.pen_command(False)
+        self.goto(-1, -0.4)
+        # self.pen_command(True)
+        self.control_command(2, 0)
+        # self.pen_command(False)
+        
     def load_json_demo2(self):
         f_lines = open("./test.json")
         lines_data = json.load(f_lines)
