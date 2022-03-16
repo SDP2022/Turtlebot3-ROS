@@ -5,9 +5,11 @@ import json
 from std_msgs.msg import String
 from painted.srv import *
 
+NAME = 'master_node'
+
 class master:
     def __init__(self):
-        rospy.init_node('master', anonymous=True)
+        rospy.init_node(NAME, anonymous=True)
         self.pub_web = rospy.Publisher('web_messages', String, queue_size=10)
         self.pub_web.publish(self.make_web_message("success", "PaintBot is ready to go! "))
         self.sub_job = rospy.Subscriber('start_job', String, self.job_callback)
