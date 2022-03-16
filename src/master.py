@@ -12,7 +12,8 @@ class master:
 
         rate = rospy.Rate(1000)
         while not rospy.is_shutdown():
-            self.pub_web.publish(self.make_web_message("success", "PaintBot is ready to go! " + str(rospy.get_time())))
+            self.pub_web.publish(self.make_web_message("success", "PaintBot is ready to go! "))
+            
         #     self.pub_web.publish(self.make_web_message("success", "hello world " + str(rospy.get_time())))
             rate.sleep()
 
