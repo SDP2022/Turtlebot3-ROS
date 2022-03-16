@@ -33,6 +33,7 @@ class control_node():
         self.angular_tolerance = radians(2.5)
 
         # Initial transform
+        rospy.sleep(10.0)
         self.initial_transform()
 
         self.log_info("Starting %s service" % (NAME))
