@@ -32,6 +32,10 @@ class control_node():
         # Publisher of state
         self.state_pub = rospy.Publisher('/state', State, queue_size=10)
         
+        # Subscriber to listen for pause request
+        self.state_sub = rospy.Subscriber('/state', State, pause_callback)
+        self.pause_requested = False
+        
         # Subscriber for object detection
         self.scan_sub = rospy.Subscriber('/scan', LaserScan, ls_callback)
         
@@ -80,6 +84,12 @@ class control_node():
         
     def ls_callback(self, msg):
         self.ranges = msg.ranges
+        
+    def pause_callback(self, msg):
+        m = msg.as_state 
+        if m=4:
+            self.pause_requested = True
+            
 
     def control_command_callback(self, req):
         print("Executing displacement=%s rotation=%s" %
@@ -115,11 +125,12 @@ class control_node():
             # Publish the Twist message and sleep 1 cycle
             self.cmd_vel.publish(move_cmd)
             
-            if self.ranges[0] < self.distance:
+            if self.ranges[0] < self.distance or self.pause_requested:
                 move_cmd = Twist()
                 move_cmd.linear.x = 0.0
                 move_cmd.angular.z = 0.0
                 object = True
+                self.pause_requested = False
 
             r.sleep()
 
