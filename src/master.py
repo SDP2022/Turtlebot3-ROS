@@ -45,7 +45,7 @@ class master:
 
         self.log_info("Job success")
         self.pub_web.publish(self.make_web_message("success", "Job is now complete!"))
-        self.state_pub.publish(self.makeStateMsg(4)
+        self.state_pub.publish(self.makeStateMsg(5)
         
     def make_web_message(self, alert_type, message):
         return json.dumps({
