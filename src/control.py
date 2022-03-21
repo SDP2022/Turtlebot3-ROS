@@ -10,6 +10,8 @@ from math import *
 from math import pi, radians
 from nav_msgs.msg import Odometry
 from std_msgs.msg import String
+from sensor_msgs.msg import LaserScan
+from msg import State
 import tf2_ros
 import copy
 import PyKDL
@@ -26,6 +28,16 @@ class control_node():
         self.cmd_vel = rospy.Publisher('/cmd_vel', Twist, queue_size=10)
         self.control_node_service = rospy.Service(
             'control_service', ControlCommand, self.control_command_callback)
+        
+        # Publisher of state
+        self.state_pub = rospy.Publisher('/state', State, queue_size=10)
+        
+        # Subscriber for object detection
+        self.scan_sub = rospy.Subscriber('/scan', LaserScan, ls_callback)
+        
+        #Some parameters for easy tuning of object avoidance
+        self.ranges = None
+        self.distance = 0.2
 
         # Initial velocity parameters
         self.linear_vel = 0.1
@@ -65,6 +77,9 @@ class control_node():
                 rospy.signal_shutdown("tf Exception")
         self.log_info(
             'transform complete, base_frame={0}'.format(self.base_frame))
+        
+    def ls_callback(self, msg):
+        self.ranges = msg.ranges
 
     def control_command_callback(self, req):
         print("Executing displacement=%s rotation=%s" %
@@ -83,7 +98,8 @@ class control_node():
         else:
             move_cmd = Twist()
             move_cmd.linear.x = self.linear_vel
-
+        m = State()
+        object = False
         r = rospy.Rate(20)
         r.sleep()
 
@@ -98,6 +114,12 @@ class control_node():
         while current_distance < goal_distance and not rospy.is_shutdown():
             # Publish the Twist message and sleep 1 cycle
             self.cmd_vel.publish(move_cmd)
+            
+            if self.ranges[0] < self.distance:
+                move_cmd = Twist()
+                move_cmd.linear.x = 0.0
+                move_cmd.angular.z = 0.0
+                object = True
 
             r.sleep()
 
@@ -110,6 +132,12 @@ class control_node():
             self.log_info("current_distance={0} position.x={1} position.y={2}".format(
                 current_distance, position.x, position.y))
         self.cmd_vel.publish(Twist())
+        if object:
+            m.as_state = 3
+            self.log_info("Object detected: robot stopping")
+        else:
+            m.as_state = 2
+        self.state_pub.publish(m)
         self.log_info("Move distance={0} completed. Acutal distance={1}".format(
             goal_distance, current_distance))
         return True
