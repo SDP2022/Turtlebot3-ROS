@@ -15,6 +15,7 @@ class master:
         self.pub_web.publish(self.make_web_message("success", "PaintBot is ready to go! "))
         self.sub_job = rospy.Subscriber('start_job', String, self.job_callback)
         self.state_pub = rospy.Publisher('/state', State, queue_size=10)
+        self.state_pub.publish(self.makeStateMsg(1))
         rospy.wait_for_service('execute_service')
         self.log_info("Starting %s service" % (NAME))
         
