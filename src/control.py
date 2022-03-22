@@ -87,7 +87,7 @@ class control_node():
         
     def pause_callback(self, msg):
         m = msg.as_state 
-        if m=4:
+        if m==4:
             self.pause_requested = True
             
 

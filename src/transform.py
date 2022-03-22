@@ -25,7 +25,7 @@ class transform_node():
 
         self.division_x = 62345.65
         self.division_y = 111139
-        self.sescale = 100
+        self.scale = 100
 
         self.irl_x = -0.095
         self.irl_y = -0.075
