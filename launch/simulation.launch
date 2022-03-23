@@ -3,10 +3,11 @@
   <env name="ROS_MASTER_URI" value="http://localhost:11311" />
   <env name="ROS_HOTNAME" value="$HOSTNAME" />
   <env name="TURTLEBOT3_MODEL" value="BURGER" />
-  <include file="$(find turtlebot3_gazebo)/launch/turtlebot3_empty_world.launch"/>
-  <include file="$(find turtlebot3_autorace_traffic_light_camera)/launch/turtlebot3_autorace_camera_pi.launch"/>
+  <include file="$(find turtlebot3_gazebo)/launch/turtlebot3_world.launch"/>
   <node name="control" pkg="painted" type="control.py" output="screen" respawn="true"/>
   <node name="master" pkg="painted" type="master.py" output="screen" respawn="true"/>
   <node name="pen" pkg="painted" type="pen.py" output="screen" respawn="true"/>
   <node name="execute" pkg="painted" type="execute.py" output="screen" respawn="true"/>
+  <node name="buzzer" pkg="painted" type="buzzer.py" output="screen" respawn="true"/>
+  <node name="led" pkg="painted" type="led.py" output="screen" respawn="true"/>
 </launch>
