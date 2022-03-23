@@ -1,6 +1,7 @@
 <!-- Starting painted on turtlebot-->
 <launch>
   <include file="$(find turtlebot3_bringup)/launch/turtlebot3_robot.launch"/>
+  <include file="$(find turtlebot3_autorace_traffic_light_camera)/launch/turtlebot3_autorace_camera_pi.launch"/>
   <node name="control" pkg="painted" type="control.py" output="screen" respawn="true"/>
   <node name="master" pkg="painted" type="master.py" output="screen" respawn="true"/>
   <node name="pen" pkg="painted" type="pen.py" output="screen" respawn="true"/>
