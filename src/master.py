@@ -15,14 +15,30 @@ class master:
         self.pub_web.publish(self.make_web_message("success", "PaintBot is ready to go! "))
         self.sub_job = rospy.Subscriber('start_job', String, self.job_callback)
         self.state_pub = rospy.Publisher('/state', State, queue_size=10)
-        self.state_pub.publish(self.makeStateMsg(1))
+        self.state_ = State.as_state.AS_OFF
+        self.state_sub = rospy.Subscriber('/state', State, self.state_cb, 1)
+        
         rospy.wait_for_service('execute_service')
         self.log_info("Starting %s service" % (NAME))
         
-    def makeStateMsg(self, message):
-        m = State()
-        m.as_state = message
-        return m
+    def state_cb(self, msg):
+        self.setState(msg.as_state)
+        
+    def setState(self, state_):
+        if (state_ == State.as_state.AS_READY):
+            self.as_state_ = State.as_state.AS_READY
+        if (state_ == State.as_state.AS_RUNNING):
+            self.as_state_ = State.as_state.AS_RUNNING
+        if (state_ == State.as_state.AS_PAUSE_REQUESTED):
+            self.as_state_ = State.as_state.AS_PAUSE_REQUESTED
+        if (state_ == State.as_state.AS_PAUSED):
+            self.as_state_ = State.as_state.AS_PAUSED
+        if (state_ == State.as_state.AS_FINISHED):
+            self.as_state_ = State.as_state.AS_FINISHED
+    
+    def queryState(self):
+        return self.as_state_
+        
 
     def job_callback(self, data):
         #testing a hypothetical situation
