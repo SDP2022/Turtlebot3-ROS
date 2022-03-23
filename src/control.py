@@ -11,7 +11,7 @@ from math import pi, radians
 from nav_msgs.msg import Odometry
 from std_msgs.msg import String
 from sensor_msgs.msg import LaserScan
-from msg import State
+from painted.msg import State
 import tf2_ros
 import copy
 import PyKDL
@@ -33,11 +33,11 @@ class control_node():
         self.state_pub = rospy.Publisher('/state', State, queue_size=10)
         
         # Subscriber to listen for pause request
-        self.state_sub = rospy.Subscriber('/state', State, pause_callback)
+        self.state_sub = rospy.Subscriber('/state', State, self.pause_callback)
         self.pause_requested = False
         
         # Subscriber for object detection
-        self.scan_sub = rospy.Subscriber('/scan', LaserScan, ls_callback)
+        self.scan_sub = rospy.Subscriber('/scan', LaserScan, self.ls_callback)
         
         #Some parameters for easy tuning of object avoidance
         self.ranges = None
@@ -87,7 +87,7 @@ class control_node():
         
     def pause_callback(self, msg):
         m = msg.as_state 
-        if m==AS_PAUSE_REQUESTED
+        if m== State().AS_REQUEST_PAUSE:
             self.pause_requested = True
             
 
@@ -108,8 +108,7 @@ class control_node():
         else:
             move_cmd = Twist()
             move_cmd.linear.x = self.linear_vel
-        m = State()
-        object = False
+        object_detect = False
         r = rospy.Rate(20)
         r.sleep()
 
@@ -129,8 +128,9 @@ class control_node():
                 move_cmd = Twist()
                 move_cmd.linear.x = 0.0
                 move_cmd.angular.z = 0.0
-                object = True
+                object_detect = True
                 self.pause_requested = False
+                break
 
             r.sleep()
 
@@ -143,15 +143,17 @@ class control_node():
             self.log_info("current_distance={0} position.x={1} position.y={2}".format(
                 current_distance, position.x, position.y))
         self.cmd_vel.publish(Twist())
-        if object:
-            m.as_state = State.as_state.AS_PAUSED
+        if object_detect:
+            self.state_pub.publish(State(3))
             self.log_info("Object detected: robot stopping")
         else:
-            m.as_state = State.as_state.AS_RUNNING
-        self.state_pub.publish(m)
+            self.state_pub.publish(State(2))
         self.log_info("Move distance={0} completed. Acutal distance={1}".format(
             goal_distance, current_distance))
-        return True
+        if object_detect:
+            return False
+        else:
+            return True
 
     def rotation(self, goal_angle):
         move_cmd = Twist()

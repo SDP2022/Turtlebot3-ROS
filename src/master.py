@@ -3,7 +3,7 @@ from distutils.archive_util import make_archive
 import rospy
 import json
 from std_msgs.msg import String
-from msg import State
+from painted.msg import State
 from painted.srv import *
 
 NAME = 'master_node'
@@ -15,8 +15,9 @@ class master:
         self.pub_web.publish(self.make_web_message("success", "PaintBot is ready to go! "))
         self.sub_job = rospy.Subscriber('start_job', String, self.job_callback)
         self.state_pub = rospy.Publisher('/state', State, queue_size=10)
-        self.state_ = State.as_state.AS_OFF
-        self.state_sub = rospy.Subscriber('/state', State, self.state_cb, 1)
+        self.as_state_ = State()
+        self.as_state_.as_state = State().AS_OFF
+        self.state_sub = rospy.Subscriber('/state', State, self.state_cb)
         
         rospy.wait_for_service('execute_service')
         self.log_info("Starting %s service" % (NAME))
@@ -25,20 +26,19 @@ class master:
         self.setState(msg.as_state)
         
     def setState(self, state_):
-        if (state_ == State.as_state.AS_READY):
-            self.as_state_ = State.as_state.AS_READY
-        if (state_ == State.as_state.AS_RUNNING):
-            self.as_state_ = State.as_state.AS_RUNNING
-        if (state_ == State.as_state.AS_PAUSE_REQUESTED):
-            self.as_state_ = State.as_state.AS_PAUSE_REQUESTED
-        if (state_ == State.as_state.AS_PAUSED):
-            self.as_state_ = State.as_state.AS_PAUSED
-        if (state_ == State.as_state.AS_FINISHED):
-            self.as_state_ = State.as_state.AS_FINISHED
+        if (state_ == State().AS_READY):
+            self.as_state_.as_state = State().AS_READY
+        if (state_ == State().AS_RUNNING):
+            self.as_state_ = State().AS_RUNNING
+        if (state_ == State().AS_REQUEST_PAUSE):
+            self.as_state_ = State().AS_REQUEST_PAUSE
+        if (state_ == State().AS_PAUSED):
+            self.as_state_ = State().AS_PAUSED
+        if (state_ == State().AS_FINISHED):
+            self.as_state_ = State().AS_FINISHED
     
     def queryState(self):
         return self.as_state_
-        
 
     def job_callback(self, data):
         #testing a hypothetical situation
@@ -50,18 +50,16 @@ class master:
         geoJSON = user_data['geoJSON'] #eg in future
         rospy.loginfo(data.data)
         #TODO Feed geojson into execution
-        
         self.log_info("Job planning success")
         self.pub_web.publish( self.make_web_message("success", "Job planning successs."))
-        self.state_pub.publish(self.makeStateMsg(1))
+        self.state_pub.publish(State(1))
         self.log_info("Job executing")
         self.pub_web.publish( self.make_web_message("info", "PaintBot is now executing the job."))
         self.execute_command()
-        self.state_pub.publish(self.makeStateMsg(2))
-
+        self.state_pub.publish(State(2))
         self.log_info("Job success")
         self.pub_web.publish(self.make_web_message("success", "Job is now complete!"))
-        self.state_pub.publish(self.makeStateMsg(5))
+        self.state_pub.publish(State(5))
         
     def make_web_message(self, alert_type, message):
         return json.dumps({
