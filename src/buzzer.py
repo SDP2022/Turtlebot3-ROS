@@ -38,7 +38,7 @@ class buzzer_node():
             rospy.logwarn("[{0}]{1}".format(NAME, 'SIM MODE OFF'))
 
     def buzzer_command_callback(self, req):
-        self.buzzer.beep()
+        self.buzzer.beep(n=1)
         return True
 
     def shutdown(self):
