@@ -28,10 +28,16 @@ class execute_node():
         self.move_base.wait_for_server(rospy.Duration(5))
         rospy.wait_for_service('pen_service')
         rospy.wait_for_service('control_service')
+        rospy.wait_for_service('led_service')
+        rospy.wait_for_service('buzzer_service')
         self.log_info("Starting %s service" % (NAME))
 
     def execute_command_callback(self, req):
         self.log_info('Starting execute')
+        self.led_command(True)
+        self.buzzer_command(True)
+        self.control_command(1, 0)
+        self.led_command(False)
         return True
 
     def control_command(self, displacement, rotation):
@@ -50,6 +56,24 @@ class execute_node():
             resp1 = pen_command(pen_status)
             d = rospy.Duration(2, 0)
             rospy.sleep(d)
+            return resp1.status
+        except rospy.ServiceException as e:
+            rospy.logerr("Service call failed: %s"%e)
+
+    def led_command(self, led_status):
+        try:
+            led_command = rospy.ServiceProxy('len_service', LEDCommand)
+            self.log_info("Requesting LED_status=%s"%(led_status))
+            resp1 = led_command(led_status)
+            return resp1.status
+        except rospy.ServiceException as e:
+            rospy.logerr("Service call failed: %s"%e)
+
+    def buzzer_command(self, buzzer_status):
+        try:
+            buzzer_command = rospy.ServiceProxy('buzzer_service', BuzzerCommand)
+            self.log_info("Requesting LED_status=%s"%(buzzer_status))
+            resp1 = buzzer_command(buzzer_status)
             return resp1.status
         except rospy.ServiceException as e:
             rospy.logerr("Service call failed: %s"%e)

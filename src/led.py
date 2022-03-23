@@ -56,7 +56,7 @@ class led_node():
         self.log_info("Stopping %s node" % (NAME))
         if self.led_status and not SIM_ENV:
             self.led.off()
-            self.log_info(" LED off success")
+            self.log_info("LED off success")
         else:
             self.log_info("LED already off, no resetting")
 
