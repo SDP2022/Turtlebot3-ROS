@@ -87,7 +87,7 @@ class control_node():
         
     def pause_callback(self, msg):
         m = msg.as_state 
-        if m==4:
+        if m==AS_PAUSE_REQUESTED
             self.pause_requested = True
             
 
@@ -144,10 +144,10 @@ class control_node():
                 current_distance, position.x, position.y))
         self.cmd_vel.publish(Twist())
         if object:
-            m.as_state = 3
+            m.as_state = State.as_state.AS_PAUSED
             self.log_info("Object detected: robot stopping")
         else:
-            m.as_state = 2
+            m.as_state = State.as_state.AS_RUNNING
         self.state_pub.publish(m)
         self.log_info("Move distance={0} completed. Acutal distance={1}".format(
             goal_distance, current_distance))
