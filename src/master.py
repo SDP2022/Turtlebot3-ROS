@@ -27,7 +27,7 @@ class master:
         
     def setState(self, state_):
         if (state_ == State().AS_READY):
-            self.as_state_.as_state = State().AS_READY
+            self.as_state_ = State().AS_READY
         if (state_ == State().AS_RUNNING):
             self.as_state_ = State().AS_RUNNING
         if (state_ == State().AS_REQUEST_PAUSE):

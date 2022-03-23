@@ -10,6 +10,7 @@ from nav_msgs.msg import Odometry
 from std_msgs.msg import String
 from move_base_msgs.msg import MoveBaseAction, MoveBaseGoal
 import actionlib
+from painted.msg import State
 from actionlib_msgs.msg import *
 from geometry_msgs.msg import Pose, Point, Quaternion
 
@@ -25,6 +26,7 @@ class execute_node():
             'execute_service', ExecuteCommand, self.execute_command_callback)
         self.move_base = actionlib.SimpleActionClient(
             "move_base", MoveBaseAction)
+        self.state_pub = rospy.Publisher('/state', State, queue_size=10)
         self.move_base.wait_for_server(rospy.Duration(5))
         rospy.wait_for_service('pen_service')
         rospy.wait_for_service('control_service')
@@ -36,7 +38,9 @@ class execute_node():
         self.log_info('Starting execute')
         self.led_command(True)
         self.buzzer_command(True)
-        self.control_command(1, 0)
+        self.control_command(10, 0)
+        rospy.sleep(rospy.Duration(2,0))
+        self.state_pub.publish(State(4))
         self.led_command(False)
         return True
 
