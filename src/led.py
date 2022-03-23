@@ -49,6 +49,7 @@ class led_node():
             self.led.on()
         else:
             self.led.off()
+        self.led_status = command_led
         return True
 
     def shutdown(self):

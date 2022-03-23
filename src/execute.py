@@ -62,7 +62,7 @@ class execute_node():
 
     def led_command(self, led_status):
         try:
-            led_command = rospy.ServiceProxy('len_service', LEDCommand)
+            led_command = rospy.ServiceProxy('led_service', LEDCommand)
             self.log_info("Requesting LED_status=%s"%(led_status))
             resp1 = led_command(led_status)
             return resp1.status
