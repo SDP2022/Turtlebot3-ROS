@@ -65,6 +65,8 @@ add_service_files(
   FILES
   ControlCommand.srv
   PenCommand.srv
+  LEDCommand.srv
+  BuzzerCommand.srv
   TransformToGeoJsonCommand.srv
   TransformToRobotCommand.srv
   ExecuteCommand.srv
@@ -217,6 +219,6 @@ include_directories(
 ## Add folders to be run by python nosetests
 # catkin_add_nosetests(test)
 
-catkin_install_python(PROGRAMS src/control.py src/master.py src/pen.py src/transform.py src/execute.py
+catkin_install_python(PROGRAMS src/control.py src/master.py src/pen.py src/transform.py src/execute.py src/led.py src/buzzer.py
   DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
 )
