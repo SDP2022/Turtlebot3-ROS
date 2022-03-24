@@ -3,7 +3,7 @@ from distutils.archive_util import make_archive
 import rospy
 import json
 from std_msgs.msg import String
-from painted.msg import State
+from painted.msg import State, Job
 from painted.srv import *
 
 NAME = 'master_node'
@@ -15,6 +15,7 @@ class master:
         self.pub_web.publish(self.make_web_message("success", "PaintBot is ready to go! "))
         self.sub_job = rospy.Subscriber('start_job', String, self.job_callback)
         self.state_pub = rospy.Publisher('/state', State, queue_size=10)
+        self.job_id_ = None
         self.as_state_ = State()
         self.as_state_.as_state = State().AS_OFF
         self.state_sub = rospy.Subscriber('/state', State, self.state_cb)
@@ -40,15 +41,17 @@ class master:
     def queryState(self):
         return self.as_state_
 
-    def job_callback(self, data):
+    def job_callback(self, msg):
         #testing a hypothetical situation
         #not currently using messages, just sending string of JSON
         self.log_info("Job recieved")
         self.pub_web.publish( self.make_web_message("success", "Job has been received and will be processed."))
-
-        user_data = json.loads(data.data)
+        
+        #preliminary implementation of job msg handling 
+        self.job_id_ = msg.job_id
+        user_data = json.loads(msg.job_data)
         geoJSON = user_data['geoJSON'] #eg in future
-        rospy.loginfo(data.data)
+        rospy.loginfo(msg.job_data)
         #TODO Feed geojson into execution
         self.log_info("Job planning success")
         self.pub_web.publish( self.make_web_message("success", "Job planning successs."))
