@@ -39,8 +39,6 @@ class execute_node():
         self.led_command(True)
         self.buzzer_command(True)
         self.control_command(10, 0)
-        rospy.sleep(rospy.Duration(2,0))
-        self.state_pub.publish(State(4))
         self.led_command(False)
         return True
 
@@ -95,6 +93,7 @@ class execute_node():
         # Start moving
         self.move_base.send_goal(goal)
         self.log_info('Goal send')
+        self.state_pub.publish(State(2))
         # Allow TurtleBot up to 60 seconds to complete task
         success = self.move_base.wait_for_result(rospy.Duration(60))
         self.log_info('Waiting result')
@@ -103,6 +102,7 @@ class execute_node():
         self.log_info('Goal state=%s' % (str(state)))
         if success and state == GoalStatus.SUCCEEDED:
             self.log_info('Goal success')
+            self.state_pub.publish(State(5))
             result = True
         else:
             self.log_info('Goal Failed')
@@ -112,6 +112,7 @@ class execute_node():
     def shutdown(self):
         # stop turtlebot, reset
         self.log_info("Stopping %s node" % (NAME))
+        self.state_pub.publish(State(0))
 
     def log_info(self, message):
         return rospy.loginfo("[{0}]{1}".format(NAME, message))
