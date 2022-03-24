@@ -146,6 +146,9 @@ class control_node():
         if object_detect:
             self.state_pub.publish(State(3))
             self.log_info("Object detected: robot stopping")
+        elif self.pause_requested:
+            self.state_pub.publish(State(3))
+            self.log_info("Paused; robot stopping")
         else:
             self.state_pub.publish(State(2))
         self.log_info("Move distance={0} completed. Acutal distance={1}".format(
