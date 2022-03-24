@@ -1,2 +1,2 @@
 string job_id 
-string json
+string job_data
