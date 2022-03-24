@@ -9,6 +9,8 @@ from nav_msgs.msg import Odometry
 from std_msgs.msg import String
 try:
     from gpiozero import Buzzer
+    # from gpiozero import Buzzer
+    # from gpiozero.tones import Tone
     SIM_ENV = False
     print('Turtlebot environment detected, enable Buzzer api')
 except ImportError:
@@ -30,6 +32,8 @@ class buzzer_node():
         if not SIM_ENV:
             self.buzzer = Buzzer(4)
             self.buzzer.off()
+            # self.buzzer = TonalBuzzer(4)
+            # self.buzzer.stop()
         self.log_info("Starting %s service" % (NAME))
 
         if SIM_ENV:
@@ -49,7 +53,16 @@ class buzzer_node():
 
     def log_info(self, message):
         return rospy.loginfo("[{0}]{1}".format(NAME, message))
-
+    
+    def rickroll(self):
+        melody = ['C5', 'E5', 'E5', 'E5', 'A5', 'F5', 'F5', 'E5', 'C5', 'E5', 'rest', 'A4', 'A4']
+        rhythmn = [6, 10, 6, 6, 1, 1, 1, 1, 6, 10, 4, 2, 10]
+        factor = 0.3
+        for i in range(len(melody)):
+            if melody[i] == 'rest':
+                continue
+            self.buzzer.play(Tone(melody[i]))
+            rospy.sleep(Duration(factor * rhythmn[i]))
 
 if __name__ == "__main__":
     rospy.loginfo("Starting %s service" % (NAME))
