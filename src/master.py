@@ -1,4 +1,5 @@
 #!/usr/bin/env python
+from ast import While
 from distutils.archive_util import make_archive
 from sys import path_hooks
 import rospy
@@ -85,18 +86,27 @@ class master:
         self.pub_web.publish(self.make_web_message(
             "info", "PaintBot is now executing the job."))
         self.state_pub.publish(State(2))
-        for execute_path in execute_list:
-            next_x = execute_path[0][0]
-            next_y = execute_path[0][1]
-            direction = execute_path[1]
-            distance = execute_path[2]
-            self.log_info('executing x=%s y=%s diretion=%s distance=%s')
-            self.execute_command(next_x, next_y, direction, distance)
-
+        execute_path_index = 0
+        while True:
+            if self.as_state_ == State(3):
+                continue
+            elif execute_path_index == len(execute_list) - 1:
+                break
+            else:
+                execute_path = execute_list[execute_path_index]
+                next_x = execute_path[0][0]
+                next_y = execute_path[0][1]
+                direction = execute_path[1]
+                distance = execute_path[2]
+                self.log_info('executing x=%s y=%s diretion=%s distance=%s')
+                self.execute_command(next_x, next_y, direction, distance)
+                execute_path_index+=1
+        
         self.log_info("Job success")
         self.pub_web.publish(self.make_web_message(
             "success", "Job is now complete!"))
         self.state_pub.publish(State(5))
+        self.job_id_ = None
 
     def make_web_message(self, alert_type, message):
         return json.dumps({
