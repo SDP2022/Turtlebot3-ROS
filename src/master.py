@@ -62,18 +62,17 @@ class master:
 
         # preliminary implementation of job msg handling
         self.job_id_ = msg.job_id
+        print(msg.job_data)
         user_data = json.loads(msg.job_data)
-        geoJSON = user_data['geoJSON']  # eg in future
-        self.log_info('msg.job_data=%s' % (msg.job_data))
-        geojson_path = self.save_geojson_file((geoJSON))
         # Feed geojson into execution
         geo_parser = GeoParser()
-        drawing_points = geo_parser.parser_file_red(geojson_path)
-        obsolete_list = geo_parser.parser_file_blue(geojson_path)
+        drawing_points = geo_parser.parser_file_red(user_data)
+        obsolete_list = geo_parser.parser_file_blue(user_data)
         self.log_info('drawing_points=%s}' % (drawing_points))
         self.log_info('obsolete_list=%s}' % (obsolete_list))
-        start_position = [30.41942059993744, 49.003321098987215]
-        point_list = Pathfinder(start_position, drawing_points, obsolete_list)
+        start_position = [-3.200362642, 55.937597084]
+        point_finder = Pathfinder(start_position, drawing_points, obsolete_list)
+        point_list = point_finder.all_together_now()
         self.log_info('Pointlist=%s}' % (point_list))
         to_executelist_parser = ExecuteListParser(
             start_position[0], start_position[1])

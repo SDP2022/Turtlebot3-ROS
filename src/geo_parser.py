@@ -6,10 +6,8 @@
 import json
 
 class GeoParser(object):
-    def parser_file_red(self, file_path):
-        with open(file_path) as f:
-            gj = json.load(f)
-
+    def parser_file_red(self, json_string):
+        gj = json_string
         red_points = []
         no_features = len(gj['features'])
 
@@ -25,13 +23,10 @@ class GeoParser(object):
         return red_points
 
 
-    def parser_file_blue(self, file_path):
-        with open(file_path) as f:
-            gj = json.load(f)
-
+    def parser_file_blue(self, json_string):
+        gj = json_string
         blue_list = []
         no_features = len(gj['features'])
-
         for x in range(no_features):
             features = gj['features'][x]
             if features['properties']['stroke'] == '#0000ff':

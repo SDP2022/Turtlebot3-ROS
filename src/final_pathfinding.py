@@ -1,5 +1,5 @@
 
-from Queue import PriorityQueue
+from queue import PriorityQueue
 import json
 class Pathfinder():
     def __init__(self,start, draw, obstacle):
@@ -7,44 +7,8 @@ class Pathfinder():
         self.draw=draw
         self.obstacle=obstacle
 
-    def parser_file_red(self, file_path):
-        with open(file_path) as f:
-            gj = json.load(f)
-
-        red_points = []
-        no_features = len(gj['features'])
-
-        for x in range(no_features):
-            features = gj['features'][x]
-            if features['properties']['stroke'] == '#ff0000':
-                point_one = (features['geometry']['coordinates'])[0]
-                point_two = (features['geometry']['coordinates'])[1]
-                no_of_points = 2 ##len(points)
-                ##for t in range(no_of_points):
-                red_points.append((point_one, point_two))
-
-        return red_points
-
-
-    def parser_file_blue(self, file_path):
-        with open(file_path) as f:
-            gj = json.load(f)
-        blue_list = []
-        no_features = len(gj['features'])
-
-        for x in range(no_features):
-            features = gj['features'][x]
-            if features['properties']['stroke'] == '#0000ff':
-                blue_list = []
-                no_of_points = len((features['geometry']['coordinates'])[0])
-
-                for t in range(no_of_points):
-                    point = (features['geometry']['coordinates'])[0]
-                    blue_list.append(point[0])
-        return blue_list
-
     def counterclockwise(self, A,B,C):
-        return (C.y-A.y)*(B.x-A.x) > (B.y-A.y)*(C.x-A.x)
+        return (C[1]-A[1])*(B[0]-A[0]) > (B[1]-A[1])*(C[0]-A[0])
 
     def intersect(self, A,B,C,D):
         return self.counterclockwise(A,C,D) != self.counterclockwise(B,C,D) and self.counterclockwise(A,B,C) != self.counterclockwise(A,B,D)
@@ -112,16 +76,18 @@ class Pathfinder():
         return dist
 
 
-    def all_together_now(self, start, draw, obstacle):
-        starts = [[start, start]]
-        all_nodes = starts+draw
+    def all_together_now(self):
+        starts = [[self.start, self.start]]
+        all_nodes = starts+self.draw
         number_of_nodes = len(all_nodes)
         g = self.Graph(number_of_nodes)
         i = 0
         while i < number_of_nodes:
+            print('i=%s nodes=%s' % (i, number_of_nodes))
             j=i+1
             while j < number_of_nodes:
-                g.add_edge(i,j, self.total_dist(i,j, all_nodes, obstacle))
+                print('j=%s nodes=%s' % (j, number_of_nodes))
+                g.add_edge(i,j, self.total_dist(i,j, all_nodes, self.obstacle))
                 j+=1
             i+=1
         D = g.dijkstra(0)
