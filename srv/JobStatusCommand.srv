@@ -1,4 +1,4 @@
 bool status
 ---
 string job_id
-uint16 status
+int8 status

@@ -21,9 +21,9 @@ class master:
         self.pub_web = rospy.Publisher('web_messages', String, queue_size=10)
         self.pub_web.publish(self.make_web_message(
             "success", "PaintBot is ready to go! "))
-        self.sub_job = rospy.Subscriber('start_job', String, self.job_callback)
+        self.sub_job = rospy.Subscriber('start_job', Job, self.job_callback)
         self.state_pub = rospy.Publisher('/state', State, queue_size=10)
-        self.job_id_ = None
+        self.job_id_ = '-1'
         self.as_state_ = State(0)
         self.as_state_.as_state = State().AS_OFF
         self.state_sub = rospy.Subscriber('/state', State, self.state_cb)
@@ -38,17 +38,18 @@ class master:
 
     def setState(self, state_):
         if (state_ == State().AS_READY):
-            self.as_state_ = State().AS_READY
+            self.as_state_ = State(State().AS_READY)
         if (state_ == State().AS_RUNNING):
-            self.as_state_ = State().AS_RUNNING
+            self.as_state_ = State(State().AS_RUNNING)
         if (state_ == State().AS_REQUEST_PAUSE):
-            self.as_state_ = State().AS_REQUEST_PAUSE
+            self.as_state_ = State(State().AS_REQUEST_PAUSE)
         if (state_ == State().AS_PAUSED):
-            self.as_state_ = State().AS_PAUSED
+            self.as_state_ = State(State().AS_PAUSED)
         if (state_ == State().AS_FINISHED):
-            self.as_state_ = State().AS_FINISHED
+            self.as_state_ = State(State().AS_FINISHED)
 
     def job_status_command_callback(self, req):
+        print(type(self.as_state_.as_state))
         return self.job_id_, self.as_state_.as_state
 
     def job_callback(self, msg):
@@ -66,8 +67,9 @@ class master:
         self.log_info('msg.job_data=%s' % (msg.job_data))
         geojson_path = self.save_geojson_file((geoJSON))
         # Feed geojson into execution
-        drawing_points = GeoParser.parser_file_red(geojson_path)
-        obsolete_list = GeoParser.parser_file_blue(geojson_path)
+        geo_parser = GeoParser()
+        drawing_points = geo_parser.parser_file_red(geojson_path)
+        obsolete_list = geo_parser.parser_file_blue(geojson_path)
         self.log_info('drawing_points=%s}' % (drawing_points))
         self.log_info('obsolete_list=%s}' % (obsolete_list))
         start_position = [30.41942059993744, 49.003321098987215]
@@ -87,28 +89,28 @@ class master:
             "info", "PaintBot is now executing the job."))
         self.state_pub.publish(State(2))
         execute_path_index = 0
-        while True:
-            if self.as_state_ == State(3):
-                continue
-            elif execute_path_index == len(execute_list) - 1:
-                break
-            else:
-                execute_path = execute_list[execute_path_index]
-                next_x = execute_path[0][0]
-                next_y = execute_path[0][1]
-                direction = execute_path[1]
-                distance = execute_path[2]
-                self.log_info('executing x=%s y=%s diretion=%s distance=%s')
-                execute_command = self.execute_command(next_x, next_y, direction, distance)
-                if not execute_command:
-                    self.state_pub.publish(State(3))
-                execute_path_index+=1
+        # while True:
+        #     if self.as_state_ == State(3):
+        #         continue
+        #     elif execute_path_index == len(execute_list) - 1:
+        #         break
+        #     else:
+        #         execute_path = execute_list[execute_path_index]
+        #         next_x = execute_path[0][0]
+        #         next_y = execute_path[0][1]
+        #         direction = execute_path[1]
+        #         distance = execute_path[2]
+        #         self.log_info('executing x=%s y=%s diretion=%s distance=%s')
+        #         execute_command = self.execute_command(next_x, next_y, direction, distance)
+        #         if not execute_command:
+        #             self.state_pub.publish(State(3))
+        #         execute_path_index+=1
         
         self.log_info("Job success")
         self.pub_web.publish(self.make_web_message(
             "success", "Job is now complete!"))
         self.state_pub.publish(State(5))
-        self.job_id_ = None
+        self.job_id_ = '-1'
         self.as_state_ = State(0)
 
     def make_web_message(self, alert_type, message):

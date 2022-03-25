@@ -6,7 +6,7 @@
 import json
 
 class GeoParser(object):
-    def parser_file_red(file_path):
+    def parser_file_red(self, file_path):
         with open(file_path) as f:
             gj = json.load(f)
 
@@ -25,7 +25,7 @@ class GeoParser(object):
         return red_points
 
 
-    def parser_file_blue(file_path):
+    def parser_file_blue(self, file_path):
         with open(file_path) as f:
             gj = json.load(f)
 
