@@ -24,7 +24,7 @@ class master:
         self.sub_job = rospy.Subscriber('start_job', String, self.job_callback)
         self.state_pub = rospy.Publisher('/state', State, queue_size=10)
         self.job_id_ = None
-        self.as_state_ = State()
+        self.as_state_ = State(0)
         self.as_state_.as_state = State().AS_OFF
         self.state_sub = rospy.Subscriber('/state', State, self.state_cb)
         self.job_status_service = rospy.Service(
@@ -54,6 +54,7 @@ class master:
     def job_callback(self, msg):
         # testing a hypothetical situation
         # not currently using messages, just sending string of JSON
+        self.state_pub.publish(State(1))
         self.log_info("Job recieved")
         self.pub_web.publish(self.make_web_message(
             "success", "Job has been received and will be processed."))
@@ -79,7 +80,6 @@ class master:
             'Job planning execute list success execute_list=%s}' % (execute_list))
         self.pub_web.publish(self.make_web_message(
             "success", "Job planning successs."))
-        self.state_pub.publish(State(1))
 
         # execution line by line
         self.log_info("Job executing")
@@ -99,7 +99,9 @@ class master:
                 direction = execute_path[1]
                 distance = execute_path[2]
                 self.log_info('executing x=%s y=%s diretion=%s distance=%s')
-                self.execute_command(next_x, next_y, direction, distance)
+                execute_command = self.execute_command(next_x, next_y, direction, distance)
+                if not execute_command:
+                    self.state_pub.publish(State(3))
                 execute_path_index+=1
         
         self.log_info("Job success")
@@ -107,6 +109,7 @@ class master:
             "success", "Job is now complete!"))
         self.state_pub.publish(State(5))
         self.job_id_ = None
+        self.as_state_ = State(0)
 
     def make_web_message(self, alert_type, message):
         return json.dumps({

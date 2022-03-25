@@ -43,17 +43,21 @@ class execute_node():
         # goto starting position
         self.led_command(True)
         self.buzzer_command(1)
-        self.goto(start_x, start_y, direction)
+        goto_result = self.goto(start_x, start_y, direction)
         self.buzzer_command(1)
         self.led_command(False)
+        if not goto_result:
+            return False
         # start drawing
         self.led_command(True)
         self.buzzer_command(2)
         self.pen_command(True)
-        self.control_command(distance, 0)
+        control_result = self.control_command(distance, 0)
         self.pen_command(False)
         self.buzzer_command(2)
         self.led_command(False)
+        if not control_result:
+            return False
         return True
 
     def control_command(self, displacement, rotation):
