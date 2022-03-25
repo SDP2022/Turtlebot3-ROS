@@ -88,6 +88,7 @@ class master:
             next_y = execute_path[0][1]
             direction = execute_path[1]
             distance = execute_path[2]
+            self.log_info('executing x=%s y=%s diretion=%s distance=%s')
             self.execute_command(next_x, next_y, direction, distance)
 
         self.log_info("Job success")
