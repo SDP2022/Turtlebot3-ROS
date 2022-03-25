@@ -26,6 +26,8 @@ class master:
         self.as_state_ = State()
         self.as_state_.as_state = State().AS_OFF
         self.state_sub = rospy.Subscriber('/state', State, self.state_cb)
+        self.job_status_service = rospy.Service(
+            'job_status_service', JobStatusCommand, self.job_status_command_callback)
 
         rospy.wait_for_service('execute_service')
         self.log_info("Starting %s service" % (NAME))
@@ -45,8 +47,8 @@ class master:
         if (state_ == State().AS_FINISHED):
             self.as_state_ = State().AS_FINISHED
 
-    def queryState(self):
-        return self.as_state_
+    def job_status_command_callback(self, req):
+        return self.job_id_, self.as_state_.as_state
 
     def job_callback(self, msg):
         # testing a hypothetical situation

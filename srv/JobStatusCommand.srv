@@ -1,0 +1,4 @@
+bool status
+---
+string job_id
+uint16 status
