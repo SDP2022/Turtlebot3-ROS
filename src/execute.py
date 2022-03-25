@@ -35,9 +35,18 @@ class execute_node():
         self.log_info("Starting %s service" % (NAME))
 
     def execute_command_callback(self, req):
-        self.log_info('Starting execute')
+        start_x = req.start_x
+        start_y = req.start_y
+        direction = req.direction
+        distance = req.distance
+        self.log_info('Starting execute once. starting_pos=%s,%s direction=%s distance=%s')
+        # goto starting position
         self.led_command(True)
-        self.buzzer_command(True)
+        self.buzzer_command(1)
+        self.goto(start_x, start_y, direction)
+        self.buzzer_command(1)
+        self.led_command(False)
+        # 
         self.control_command(10, 0)
         self.led_command(False)
         return True
@@ -71,10 +80,10 @@ class execute_node():
         except rospy.ServiceException as e:
             rospy.logerr("Service call failed: %s"%e)
 
-    def buzzer_command(self, buzzer_status):
+    def buzzer_command(self, buzzer_beep):
         try:
             buzzer_command = rospy.ServiceProxy('buzzer_service', BuzzerCommand)
-            self.log_info("Requesting LED_status=%s"%(buzzer_status))
+            self.log_info("Requesting Buzzer_status=%s"%(buzzer_status))
             resp1 = buzzer_command(buzzer_status)
             return resp1.status
         except rospy.ServiceException as e:

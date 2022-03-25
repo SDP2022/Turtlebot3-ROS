@@ -1,5 +1,6 @@
 #!/usr/bin/env python
 from distutils.archive_util import make_archive
+from sys import path_hooks
 import rospy
 import json
 from std_msgs.msg import String
@@ -7,6 +8,8 @@ from painted.msg import State, Job
 from painted.srv import *
 import json
 from geo_parser import GeoParser
+from final_pathfinding import Pathfinder
+from executelist_parser import ExecuteListParser
 
 NAME = 'master_node'
 
@@ -56,21 +59,37 @@ class master:
         self.job_id_ = msg.job_id
         user_data = json.loads(msg.job_data)
         geoJSON = user_data['geoJSON']  # eg in future
-        rospy.loginfo(msg.job_data)
-        geojson_path = self.save_geojson_file((msg.job_data))
+        self.log_info('msg.job_data=%s' % (msg.job_data))
+        geojson_path = self.save_geojson_file((geoJSON))
+        # Feed geojson into execution
         drawing_points = GeoParser.parser_file_red(geojson_path)
         obsolete_list = GeoParser.parser_file_blue(geojson_path)
-
-        # TODO Feed geojson into execution
-        self.log_info("Job planning success")
+        self.log_info('drawing_points=%s}' % (drawing_points))
+        self.log_info('obsolete_list=%s}' % (obsolete_list))
+        start_position = [30.41942059993744, 49.003321098987215]
+        point_list = Pathfinder(start_position, drawing_points, obsolete_list)
+        self.log_info('Pointlist=%s}' % (point_list))
+        to_executelist_parser = ExecuteListParser(
+            start_position[0], start_position[1])
+        execute_list = to_executelist_parser.to_execute_list(point_list)
+        self.log_info(
+            'Job planning execute list success execute_list=%s}' % (execute_list))
         self.pub_web.publish(self.make_web_message(
             "success", "Job planning successs."))
         self.state_pub.publish(State(1))
+
+        # execution line by line
         self.log_info("Job executing")
         self.pub_web.publish(self.make_web_message(
             "info", "PaintBot is now executing the job."))
-        self.execute_command()
         self.state_pub.publish(State(2))
+        for execute_path in execute_list:
+            next_x = execute_path[0][0]
+            next_y = execute_path[0][1]
+            direction = execute_path[1]
+            distance = execute_path[2]
+            self.execute_command(next_x, next_y, direction, distance)
+
         self.log_info("Job success")
         self.pub_web.publish(self.make_web_message(
             "success", "Job is now complete!"))
@@ -82,12 +101,12 @@ class master:
             "message": message
         })
 
-    def execute_command(self):
+    def execute_command(self, x, y, direction, distance):
         try:
             execute_command = rospy.ServiceProxy(
                 'execute_service', ExecuteCommand)
             self.log_info("Requesting execute_service")
-            resp1 = execute_command(True)
+            resp1 = execute_command(x, y, direction, distance)
             return resp1.status
         except rospy.ServiceException as e:
             rospy.logerr("Service call failed: %s" % e)

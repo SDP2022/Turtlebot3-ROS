@@ -1,3 +1,6 @@
-bool execute
+float64 start_x
+float64 start_y
+float64 direction
+float64 distance
 ---
 bool status
