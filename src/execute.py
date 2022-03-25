@@ -46,8 +46,13 @@ class execute_node():
         self.goto(start_x, start_y, direction)
         self.buzzer_command(1)
         self.led_command(False)
-        # 
-        self.control_command(10, 0)
+        # start drawing
+        self.led_command(True)
+        self.buzzer_command(2)
+        self.pen_command(True)
+        self.control_command(distance, 0)
+        self.pen_command(False)
+        self.buzzer_command(2)
         self.led_command(False)
         return True
 
