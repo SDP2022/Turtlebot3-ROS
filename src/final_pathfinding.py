@@ -55,8 +55,10 @@ class Pathfinder():
         number_of_obstacle_pts = len(obstacle)
         i=0
         while i < number_of_obstacle_pts-1:
+            
             if self.intersect(points[x][1], points[y][0], obstacle[i], obstacle[i+1]):
                 intersects = True
+            i = i + 1
         if intersects == True:
             minimum_x = 999999999
             minimum_y = 999999999
