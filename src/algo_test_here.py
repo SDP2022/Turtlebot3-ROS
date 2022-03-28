@@ -172,7 +172,5 @@ start_position = [-3.200362642, 55.937597084]
 point_finder = Pathfinder(start_position, drawing_points, obsolete_list)
 point_list = point_finder.all_together_now()
 print('Pointlist=%s}' % (point_list))
-to_executelist_parser = ExecuteListParser(
-    start_position[0], start_position[1])
-execute_list = to_executelist_parser.to_execute_list(point_list)
+execute_list = ExecuteListParser(point_list)
 print('Job planning execute list success execute_list=%s}' % (execute_list))
