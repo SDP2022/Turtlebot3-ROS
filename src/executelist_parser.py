@@ -9,7 +9,7 @@ def calc_angle(start_x, start_y, end_x, end_y): #takes moves and a start pos to 
         angle = math.atan(x_dist / y_dist)
     elif start_y > end_y:
         angle = -math.pi / 2
-    elif end_y < start_y:
+    elif end_y <= start_y:
         angle = math.pi / 2
     else:
         angle = 0
