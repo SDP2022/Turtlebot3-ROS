@@ -95,7 +95,7 @@ class master:
                 d = rospy.Duration(2, 0)
                 rospy.sleep(d)
                 continue
-            elif execute_path_index == len(execute_list) - 1:
+            elif execute_path_index == len(execute_list):
                 break
             else:
                 self.log_info(execute_path_index)
