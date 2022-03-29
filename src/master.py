@@ -49,34 +49,37 @@ class master:
             self.as_state_ = State(State().AS_FINISHED)
 
     def job_status_command_callback(self, req):
-        print(type(self.as_state_.as_state))
+        # print(type(self.as_state_.as_state))
         return self.job_id_, self.as_state_.as_state
 
     def job_callback(self, msg):
         # testing a hypothetical situation
         # not currently using messages, just sending string of JSON
         self.state_pub.publish(State(1))
-        self.log_info("Job recieved")
+        self.log_info("Job Recieved")
         self.pub_web.publish(self.make_web_message(
             "success", "Job has been received and will be processed."))
 
         # preliminary implementation of job msg handling
         self.job_id_ = msg.job_id
-        print(msg.job_data)
+        self.log_info('Job ID=%s' % (self.job_id_))
+        self.log_info('Job Data=%s' % (msg.job_data))
         user_data = json.loads(msg.job_data)
         # Feed geojson into execution
         geo_parser = GeoParser()
         drawing_points = geo_parser.parser_file_red(user_data)
         obsolete_list = geo_parser.parser_file_blue(user_data)
-        self.log_info('drawing_points=%s}' % (drawing_points))
-        self.log_info('obsolete_list=%s}' % (obsolete_list))
+        self.log_info('Drawing_points=%s}' % (drawing_points))
+        self.log_info('Obsolete_list=%s}' % (obsolete_list))
         start_position = [-3.200362642, 55.937597084]
         point_finder = Pathfinder(start_position, drawing_points, obsolete_list)
         point_list = point_finder.all_together_now()
         self.log_info('Pointlist=%s}' % (point_list))
         execute_list = ExecuteListParser(point_list)
         self.log_info(
-            'Job planning execute list success execute_list=%s}' % (execute_list))
+            'Job planning execute list success execute_list=%s' % (execute_list))
+        self.log_info('len(execute_list)=%s' %(len(execute_list)))
+        
         self.pub_web.publish(self.make_web_message(
             "success", "Job planning successs."))
 
@@ -86,23 +89,25 @@ class master:
             "info", "PaintBot is now executing the job."))
         self.state_pub.publish(State(2))
         execute_path_index = 0
-        # while True:
-        #     if self.as_state_ == State(3):
-        #         continue
-        #     elif execute_path_index == len(execute_list) - 1:
-        #         break
-        #     else:
-        #         execute_path = execute_list[execute_path_index]
-        #         next_x = execute_path[0][0]
-        #         next_y = execute_path[0][1]
-        #         direction = execute_path[1]
-        #         distance = execute_path[2]
-        #         self.log_info('executing x=%s y=%s diretion=%s distance=%s')
-        #         execute_command = self.execute_command(next_x, next_y, direction, distance)
-        #         if not execute_command:
-        #             self.state_pub.publish(State(3))
-        #         execute_path_index+=1
-        
+        while True:
+            if self.as_state_ == State(3):
+                self.log_info('Job Pause')
+                d = rospy.Duration(2, 0)
+                rospy.sleep(d)
+                continue
+            elif execute_path_index == len(execute_list) - 1:
+                break
+            else:
+                self.log_info(execute_path_index)
+                next_x = execute_list[execute_path_index][0][0]
+                next_y = execute_list[execute_path_index][0][1]
+                direction = execute_list[execute_path_index][1]
+                distance = execute_list[execute_path_index][2]
+                self.log_info('Executing x=%s y=%s diretion=%s distance=%s' % (next_x, next_y, direction, distance))
+                execute_command = self.execute_command(next_x, next_y, direction, distance)
+                if not execute_command:
+                    self.state_pub.publish(State(3))
+                execute_path_index += 1
         self.log_info("Job success")
         self.pub_web.publish(self.make_web_message(
             "success", "Job is now complete!"))

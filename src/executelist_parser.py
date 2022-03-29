@@ -77,7 +77,7 @@ def ExecuteListParser(lines_data):
         curr_move[2] = calc_dist(x_0,y_0,x_1,y_1)
         
         if len(move_triple) == 0:
-            move_triple = curr_move
+            move_triple = [curr_move]
         else:
             move_triple.append(curr_move)
         print(curr_move)

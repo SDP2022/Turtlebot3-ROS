@@ -1,5 +1,5 @@
 
-from queue import PriorityQueue
+from Queue import PriorityQueue
 import json
 class Pathfinder():
     def __init__(self,start, draw, obstacle):
