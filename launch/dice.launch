@@ -1,0 +1,8 @@
+<!-- Starting ros_bridge on DICE-->
+<launch>
+    <!-- ROS_BRIDGE -->
+    <include file="$(find rosbridge_server)/launch/rosbridge_websocket.launch"/>
+
+    <!-- Nav stack -->
+    <!-- roslaunch turtlebot3_navigation turtlebot3_navigation.launch map_file:=$HOME/Desktop/map.yaml -->
+</launch>

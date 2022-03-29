@@ -1,8 +1,7 @@
-
 from Queue import PriorityQueue
 import json
 class Pathfinder():
-    def __init__(self,start, draw, obstacle):
+    def __init__(self, start, draw, obstacle):
         self.start=start
         self.draw=draw
         self.obstacle=obstacle
@@ -99,4 +98,5 @@ class Pathfinder():
             order.append(w)
             coords_order.append(all_nodes[w])
         print(order)
+        coords_order.pop(0)
         return coords_order

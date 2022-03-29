@@ -13,6 +13,7 @@ import actionlib
 from painted.msg import State
 from actionlib_msgs.msg import *
 from geometry_msgs.msg import Pose, Point, Quaternion
+from tf.transformations import quaternion_from_euler
 
 NAME = 'execute_node'
 
@@ -39,7 +40,7 @@ class execute_node():
         start_y = req.start_y
         direction = req.direction
         distance = req.distance
-        self.log_info('Starting execute once. starting_pos=%s,%s direction=%s distance=%s')
+        self.log_info('Starting execute once. starting_pos=%s,%s direction=%s distance=%s' % (start_x, start_y, direction, distance))
         # goto starting position
         self.led_command(True)
         self.buzzer_command(1)
@@ -92,15 +93,16 @@ class execute_node():
     def buzzer_command(self, buzzer_beep):
         try:
             buzzer_command = rospy.ServiceProxy('buzzer_service', BuzzerCommand)
-            self.log_info("Requesting Buzzer_status=%s"%(buzzer_status))
-            resp1 = buzzer_command(buzzer_status)
+            self.log_info("Requesting Buzzer_status=%s"%(buzzer_beep))
+            resp1 = buzzer_command(buzzer_beep)
             return resp1.status
         except rospy.ServiceException as e:
             rospy.logerr("Service call failed: %s"%e)
 
     def goto(self, x, y, direction):
-        pos = {'x': x, 'y' : y}
-        quat = {'r1' : 0.000, 'r2' : 0.000, 'r3' : 0.000, 'r4' : direction}
+        pos = {'x': x, 'y' : -y}
+        z, w = self.angle_to_quat(direction)
+        quat = {'r1' : 0.000, 'r2' : 0.000, 'r3' : z, 'r4' : w}
         self.log_info('Requesting goto pos={0} quat={1}'.format(pos, quat))
         # Send a goal
         goal = MoveBaseGoal()
@@ -131,6 +133,12 @@ class execute_node():
         # stop turtlebot, reset
         self.log_info("Stopping %s node" % (NAME))
         self.state_pub.publish(State(0))
+
+    def angle_to_quat(self, angle):
+        q = quaternion_from_euler(0,0,angle)
+        z = q[2]
+        w = q[3]
+        return z, w
 
     def log_info(self, message):
         return rospy.loginfo("[{0}]{1}".format(NAME, message))
