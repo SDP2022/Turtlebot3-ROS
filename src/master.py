@@ -99,6 +99,7 @@ class master:
                 break
             else:
                 self.log_info(execute_path_index)
+                inc_by = 1
                 next_x = execute_list[execute_path_index][0][0]
                 next_y = execute_list[execute_path_index][0][1]
                 direction = execute_list[execute_path_index][1]
@@ -107,7 +108,8 @@ class master:
                 execute_command = self.execute_command(next_x, next_y, direction, distance)
                 if not execute_command:
                     self.state_pub.publish(State(3))
-                execute_path_index += 1
+                    inc_by = 0
+                execute_path_index += inc_by
         self.log_info("Job success")
         self.pub_web.publish(self.make_web_message(
             "success", "Job is now complete!"))
