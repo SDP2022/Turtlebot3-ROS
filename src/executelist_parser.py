@@ -5,12 +5,14 @@ import math
 def calc_angle(start_x, start_y, end_x, end_y): #takes moves and a start pos to calculate where the last position is (continuous)
     x_dist = abs(start_x - end_x)
     y_dist = abs(start_y - end_y)
-    if y_dist != 0:
+    if y_dist != 0 and x_dist != 0:
         angle = math.atan(x_dist / y_dist)
     elif start_x < end_x:
         angle = math.pi / 2
     elif end_x < start_x:
         angle = -math.pi / 2
+    elif start_y > end_y:
+        angle = math.pi
     else:
         angle = 0
     
@@ -67,10 +69,6 @@ def ExecuteListParser(lines_data):
         x_1 = relative_point_geo_to_real_pen(line[1][0], line[1][1])[0]
         y_1 = relative_point_geo_to_real_pen(line[1][0], line[1][1])[1]
         
-        #x_0 = line[0][0]
-        #y_0 = line[0][1]
-        #x_1 = line[1][0]
-        #y_1 = line[1][1]
         
         curr_move[0] = [x_0,y_0]
         curr_move[1] = calc_angle(x_0,y_0,x_1,y_1)
@@ -86,8 +84,3 @@ def ExecuteListParser(lines_data):
     return move_triple
 
 
-#f_lines = open("test3.json")
-
-#lines_data = json.load(f_lines)
-
-#ExecuteListParser(lines_data)
