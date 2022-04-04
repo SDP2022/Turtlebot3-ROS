@@ -82,7 +82,7 @@ def ExecuteListParser(lines_data):
             move_triple = [curr_move]
         else:
             move_triple.append(curr_move)
-    print("The list of all moves as triple: " + move_triple)
+    print("The list of all moves as triple: " + str(move_triple))
 
     return move_triple
 
