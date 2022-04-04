@@ -107,6 +107,8 @@ class master:
                 direction = execute_list[execute_path_index][1]
                 distance = execute_list[execute_path_index][2]
                 self.log_info('Executing x=%s y=%s diretion=%s distance=%s' % (next_x, next_y, direction, distance))
+                self.pub_web.publish(self.make_web_message(
+                    "info", "'Executing x=%s y=%s diretion=%s distance=%s' % (next_x, next_y, direction, distance)"))
                 execute_command = self.execute_command(next_x, next_y, direction, distance)
                 if not execute_command:
                     self.state_pub.publish(State(3))
