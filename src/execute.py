@@ -44,23 +44,24 @@ class execute_node():
         distance = req.distance
         self.log_info('Starting execute once. starting_pos=%s,%s direction=%s distance=%s' % (start_x, start_y, direction, distance))
         # goto starting position
-        self.led_command(True)
+        self.led_command('blue')
         self.buzzer_command(1)
         goto_result = self.goto(start_x, start_y, direction)
         self.buzzer_command(1)
-        self.led_command(False)
         if not goto_result:
+            self.led_command('red')
             return False
-        # start drawing
-        self.led_command(True)
+        self.led_command('yellow')
+        # start drawing)
         self.buzzer_command(2)
         self.pen_command(True)
         control_result = self.control_command(distance, 0)
         self.pen_command(False)
         self.buzzer_command(2)
-        self.led_command(False)
         if not control_result:
+            self.led_command('red')
             return False
+        self.led_command('green')
         return True
 
     def control_command(self, displacement, rotation):

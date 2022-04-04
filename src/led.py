@@ -76,11 +76,7 @@ class led_node():
     def shutdown(self):
         # stop turtlebot, reset
         self.log_info("Stopping %s node" % (NAME))
-        if self.led_status and not SIM_ENV:
-            self.colorWipe(self.led_strip, Color(0,0,0))
-            self.log_info("LED off success")
-        else:
-            self.log_info("LED already off, no resetting")
+        self.colorWipe(self.led_strip, Color(0,0,0))
 
     def log_info(self, message):
         return rospy.loginfo("[{0}]{1}".format(NAME, message))
