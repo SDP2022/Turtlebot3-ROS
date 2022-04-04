@@ -15,6 +15,7 @@ from painted.msg import State
 import tf2_ros
 import copy
 import PyKDL
+import json
 
 NAME = 'control_node'
 
@@ -41,7 +42,7 @@ class control_node():
         
         #Some parameters for easy tuning of object avoidance
         self.ranges = None
-        self.distance = 0.2
+        self.distance = 0.1
 
         # Initial velocity parameters
         self.linear_vel = 0.1
@@ -51,6 +52,9 @@ class control_node():
         # Initial transform
         rospy.sleep(10.0)
         self.initial_transform()
+
+        # Web message
+        self.pub_web = rospy.Publisher('web_messages', String, queue_size=10)
 
         self.log_info("Starting %s service" % (NAME))
 
@@ -129,7 +133,7 @@ class control_node():
                 move_cmd.linear.x = 0.0
                 move_cmd.angular.z = 0.0
                 object_detect = True
-                self.pause_requested = False
+                # self.pause_requested = False
                 break
 
             r.sleep()
@@ -140,15 +144,20 @@ class control_node():
             # Compute the Euclidean distance from the start
             current_distance = sqrt(pow((position.x - x_start), 2) +
                                     pow((position.y - y_start), 2))
-            self.log_info("current_distance={0} position.x={1} position.y={2}".format(
-                current_distance, position.x, position.y))
+            # self.log_info("current_distance={0} position.x={1} position.y={2}".format(
+            #     current_distance, position.x, position.y))
         self.cmd_vel.publish(Twist())
         if object_detect:
             self.state_pub.publish(State(3))
             self.log_info("Object detected: robot stopping")
+            self.pub_web.publish(self.make_web_message(
+                    "warning", "Object detected: robot stopping"))
         elif self.pause_requested:
             self.state_pub.publish(State(3))
+            self.pause_requested = False
             self.log_info("Paused; robot stopping")
+            self.pub_web.publish(self.make_web_message(
+                    "warning", "Paused; robot stopping"))
         else:
             self.state_pub.publish(State(2))
         self.log_info("Move distance={0} completed. Acutal distance={1}".format(
@@ -218,6 +227,12 @@ class control_node():
         while res < -pi:
             res += 2.0 * pi
         return res
+
+    def make_web_message(self, alert_type, message):
+        return json.dumps({
+            "alert_type": alert_type,
+            "message": message
+        })
 
     def log_info(self, message):
         return rospy.loginfo("[{0}]{1}".format(NAME, message))

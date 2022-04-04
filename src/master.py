@@ -92,7 +92,9 @@ class master:
         while True:
             if self.as_state_ == State(3):
                 self.log_info('Job Pause')
-                d = rospy.Duration(2, 0)
+                d = rospy.Duration(5, 0)
+                self.pub_web.publish(self.make_web_message(
+                    "warning", "Job is now Paused. PLease resume when ready!"))
                 rospy.sleep(d)
                 continue
             elif execute_path_index == len(execute_list):
