@@ -36,8 +36,10 @@ class execute_node():
         self.log_info("Starting %s service" % (NAME))
 
     def execute_command_callback(self, req):
-        start_x = req.start_x
-        start_y = req.start_y
+        # start_x = req.start_x
+        # start_y = req.start_y
+        start_y = req.start_x
+        start_x = req.start_y
         direction = req.direction
         distance = req.distance
         self.log_info('Starting execute once. starting_pos=%s,%s direction=%s distance=%s' % (start_x, start_y, direction, distance))
