@@ -5,14 +5,18 @@ import math
 def calc_angle(start_x, start_y, end_x, end_y): #takes moves and a start pos to calculate where the last position is (continuous)
     x_dist = abs(start_x - end_x)
     y_dist = abs(start_y - end_y)
-    if y_dist != 0 and x_dist != 0:
-        angle = math.atan(x_dist / y_dist)
+    if y_dist != 0:
+        if x_dist == 0 and start_y > end_y:
+            angle = math.pi
+        elif x_dist == 0 and start_y < end_y:
+            angle = 0
+        else:
+            angle = math.atan(x_dist / y_dist)
+    
     elif start_x < end_x:
         angle = math.pi / 2
     elif end_x < start_x:
         angle = -math.pi / 2
-    elif start_y > end_y:
-        angle = math.pi
     else:
         angle = 0
     
