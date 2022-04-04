@@ -1,5 +1,8 @@
 #!/usr/bin/env python
 
+import os
+os.popen('source /opt/ros/kinetic/setup.bash')
+os.popen('source /home/pi/catkin_ws/devel/setup.bash')
 from painted.srv import *
 import rospy
 from geometry_msgs.msg import Twist, Point, Quaternion
@@ -9,6 +12,8 @@ from nav_msgs.msg import Odometry
 from std_msgs.msg import String
 try:
     from gpiozero import LED
+    from grove.grove_ws2813_rgb_led_strip import GroveWS2813RgbStrip
+    from rpi_ws281x import Color
     SIM_ENV = False
     print('Turtlebot environment detected, enable LED api')
 except ImportError:
@@ -28,10 +33,17 @@ class led_node():
 
         # Initial LED parameters
         if not SIM_ENV:
-            self.led = LED(14)
-            self.led.off()
+            # self.led = LED(14)
+            self.led_strip = GroveWS2813RgbStrip(18, 60)
+            self.colorWipe(self.led_strip, Color(0,0,0))
+            # self.led.off()
         self.led_status = False  # inital LED status is off
         self.log_info("Starting %s service" % (NAME))
+
+        self.blue = Color(0,143,255)
+        self.yellow = Color(255,255,0)
+        self.green = Color(41,255,0)
+        self.red = Color(255,0,43)
 
         if SIM_ENV:
             rospy.logwarn("[{0}]{1}".format(NAME, 'SIM MODE ON'))
@@ -42,21 +54,30 @@ class led_node():
         command_led = req.led
         self.log_info("command_led=%s self.led_status=%s" %
                       (command_led, self.led_status))
-        if command_led == self.led_status:
-            self.log_info("Statue same, wont execute")
-            return False
-        if command_led:
-            self.led.on()
+        if command_led == 'red':
+            self.colorWipe(self.led_strip, self.red)
+        elif command_led == 'yellow':
+            self.colorWipe(self.led_strip, self.yellow)
+        elif command_led == 'green':
+            self.colorWipe(self.led_strip, self.green)
+        elif command_led == 'blue':
+            self.colorWipe(self.led_strip, self.blue)
         else:
-            self.led.off()
-        self.led_status = command_led
+            self.colorWipe(self.led_strip, Color(0,0,0))
         return True
+    
+    def colorWipe(self, strip, color, wait_ms=50):
+        """Wipe color across display a pixel at a time."""
+        for i in range(strip.numPixels()*2):
+            strip.setPixelColor(i, color)
+            strip.show()
+            rospy.sleep(wait_ms/1000.0)
 
     def shutdown(self):
         # stop turtlebot, reset
         self.log_info("Stopping %s node" % (NAME))
         if self.led_status and not SIM_ENV:
-            self.led.off()
+            self.colorWipe(self.led_strip, Color(0,0,0))
             self.log_info("LED off success")
         else:
             self.log_info("LED already off, no resetting")
