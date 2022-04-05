@@ -1,8 +1,6 @@
 #!/usr/bin/env python
 
 import os
-os.popen('source /opt/ros/kinetic/setup.bash')
-os.popen('source /home/pi/catkin_ws/devel/setup.bash')
 from painted.srv import *
 import rospy
 from geometry_msgs.msg import Twist, Point, Quaternion
@@ -56,6 +54,9 @@ class led_node():
                       (command_led, self.led_status))
         if command_led == 'red':
             self.colorWipe(self.led_strip, self.red)
+        elif command_led == 'warning':
+            self.colorWipe(self.led_strip, self.red)
+            self.colorWipe(self.led_strip, self.blue)
         elif command_led == 'yellow':
             self.colorWipe(self.led_strip, self.yellow)
         elif command_led == 'green':
@@ -68,7 +69,7 @@ class led_node():
     
     def colorWipe(self, strip, color, wait_ms=50):
         """Wipe color across display a pixel at a time."""
-        for i in range(strip.numPixels()*2):
+        for i in range(strip.numPixels()):
             strip.setPixelColor(i, color)
             strip.show()
             rospy.sleep(wait_ms/1000.0)
