@@ -28,6 +28,7 @@ class execute_node():
         self.move_base = actionlib.SimpleActionClient(
             "move_base", MoveBaseAction)
         self.state_pub = rospy.Publisher('/state', State, queue_size=10)
+        self.state_sub = rospy.Subscriber('/state', State, self.state_cb)
         self.move_base.wait_for_server(rospy.Duration(5))
         rospy.wait_for_service('pen_service')
         rospy.wait_for_service('control_service')
@@ -35,6 +36,10 @@ class execute_node():
         rospy.wait_for_service('buzzer_service')
         self.log_info("Starting %s service" % (NAME))
 
+    def state_cb(self, msg):
+        if msg.as_state == State().AS_PAUSED:
+            self.buzzer_command(2)
+    
     def execute_command_callback(self, req):
         # start_x = req.start_x
         # start_y = req.start_y
