@@ -50,9 +50,9 @@ class execute_node():
         self.log_info('Starting execute once. starting_pos=%s,%s direction=%s distance=%s' % (start_x, start_y, direction, distance))
         # goto starting position
         self.led_command('blue')
-        self.buzzer_command(1)
+        # self.buzzer_command(1)
         goto_result = self.goto(start_x, start_y, direction)
-        self.buzzer_command(1)
+        # self.buzzer_command(1)
         if not goto_result:
             self.led_command('red')
             return False
@@ -62,7 +62,7 @@ class execute_node():
         self.pen_command(True)
         control_result = self.control_command(distance, 0)
         self.pen_command(False)
-        self.buzzer_command(2)
+        # self.buzzer_command(2)
         if not control_result:
             self.led_command('red')
             return False
